@@ -1,3 +1,18 @@
+# Amusing Audio Studio (Takeflow engine)
+
+The home page (`public/index.html`) is a **timeline editor**: audio lives on a timeline as clips.
+
+- **C** cutter tool: click anywhere to cut. **K** cuts at the playhead.
+- **S** select tool: click a clip or drag a range, then **Delete**. **Ctrl+Z / Ctrl+Y** undo and redo.
+- **R** records at the playhead. New audio is inserted there; nothing is overwritten.
+- **Fill gaps** on: deleting closes the gap and a new take pushes the rest right. Off: deleted parts stay empty, and a take fills the gap (later audio moves only if the take is longer).
+- **New recording…** asks first, then clears the timeline (Ctrl+Z brings it back).
+- **Enhance** (AI noise removal, presets, loudness) with an original/enhanced switch (**B**), and **Export** to WAV, FLAC, MP3 or Opus.
+
+The original single-waveform editor is still available at `/classic` (`public/classic.html`). Both share the code in `public/js/`.
+
+---
+
 # Takeflow
 
 A voice recorder and editor that runs entirely in the browser. Record, stop at a mistake, and re-record from that exact point with a click-free join. Clean up the result with AI noise removal and one-click presets, then export studio-quality WAV, FLAC, MP3 or Opus. Nothing is uploaded: audio stays on the user's device.

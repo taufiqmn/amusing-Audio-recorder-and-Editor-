@@ -1,7 +1,7 @@
 // Takeflow service worker: the app works offline after the first visit.
-const VERSION = 'takeflow-v1.0.0';
+const VERSION = 'takeflow-v2.0.0';
 const APP = [
-  './', 'index.html', 'css/app.css', 'manifest.webmanifest',
+  './', 'index.html', 'classic.html', 'css/app.css', 'manifest.webmanifest',
   'js/app.js', 'js/engine.js', 'js/waveform.js', 'js/player.js', 'js/recorder.js', 'js/storage.js',
   'js/dsp.js', 'js/enhance.js', 'js/presets.js', 'js/encoders.js',
   'js/worklets/recorder-worklet.js', 'js/workers/enhance-worker.js', 'js/workers/export-worker.js',

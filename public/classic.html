@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Takeflow: record, fix and polish your voice in the browser</title>
+  <meta name="description" content="Free online voice recorder and editor. Record, cut, re-record from any point, remove background noise with AI, and export studio-quality WAV, FLAC, MP3 or Opus. Everything stays on your device.">
+  <meta name="theme-color" content="#16132b" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f5f3fb" media="(prefers-color-scheme: light)">
+  <meta property="og:title" content="Takeflow voice recorder and editor">
+  <meta property="og:description" content="Record, punch in, clean up and export studio-quality voice audio. Private: nothing is uploaded.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="modulepreload" href="js/app.js">
+</head>
+<body>
+  <a class="skip" href="#btnRecord">Skip to recording controls</a>
+
+  <header class="top">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 32 32" aria-hidden="true">
+        <rect x="1" y="1" width="30" height="30" rx="9" fill="var(--surface-2)"/>
+        <rect x="7" y="12" width="3" height="8" rx="1.5" fill="var(--wave)"/>
+        <rect x="12" y="8" width="3" height="16" rx="1.5" fill="var(--wave)"/>
+        <rect x="17" y="11" width="3" height="10" rx="1.5" fill="var(--wave)"/>
+        <circle cx="24.5" cy="16" r="3" fill="var(--rec)"/>
+      </svg>
+      <span class="wordmark">Takeflow</span>
+    </div>
+    <label class="project">
+      <span class="sr-only">Recording name</span>
+      <input id="projectName" class="project-name" value="Untitled recording" maxlength="80" spellcheck="false">
+    </label>
+    <span id="saveState" class="save-state" aria-live="polite">Saved on this device</span>
+    <div class="top-actions">
+      <button id="btnOpen" class="btn ghost" type="button">Open audio file</button>
+      <input id="fileInput" type="file" accept="audio/*,video/*,.wav,.mp3,.m4a,.flac,.ogg,.opus,.webm,.aac" hidden>
+      <button id="btnNew" class="btn ghost" type="button">New recording</button>
+      <button id="btnHelp" class="btn ghost square" type="button" aria-label="Keyboard shortcuts and help">?</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="stage" aria-label="Timeline">
+      <div class="wave-wrap" id="waveWrap">
+        <canvas id="wave" aria-label="Waveform. Click to place the cursor, drag to select." tabindex="0"></canvas>
+        <div class="drop-hint" id="dropHint" hidden>Drop to open this audio file</div>
+      </div>
+      <canvas id="overview" class="overview" aria-label="Whole recording overview. Click to jump."></canvas>
+      <div class="view-tools">
+        <span id="selInfo" class="sel-info">No selection</span>
+        <div class="zoom">
+          <label class="check small"><input type="checkbox" id="follow" checked> Follow playback</label>
+          <button class="btn ghost square" id="zoomOut" type="button" aria-label="Zoom out">−</button>
+          <button class="btn ghost square" id="zoomIn" type="button" aria-label="Zoom in">+</button>
+          <button class="btn ghost" id="zoomFit" type="button">Show all</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="transport" aria-label="Transport">
+      <div class="clock" aria-live="off">
+        <span id="clockNow" class="clock-now">0:00.00</span>
+        <span class="clock-total">of <span id="clockTotal">0:00.00</span></span>
+      </div>
+      <div class="transport-buttons">
+        <button id="btnHome" class="tbtn" type="button" aria-label="Go to start (Home)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg>
+        </button>
+        <button id="btnPlay" class="tbtn" type="button" aria-label="Play (Space)">
+          <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>
+          <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+        </button>
+        <button id="btnRecord" class="rec" type="button" aria-label="Record (R)">
+          <span class="rec-ring" aria-hidden="true"></span><span class="rec-core" aria-hidden="true"></span>
+        </button>
+        <button id="btnStop" class="tbtn" type="button" aria-label="Stop (Esc)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg>
+        </button>
+        <button id="btnEnd" class="tbtn" type="button" aria-label="Go to end (End)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg>
+        </button>
+      </div>
+      <div class="punch">
+        <label class="field">
+          <span>When I record at the cursor</span>
+          <select id="punchMode">
+            <option value="replace-end">Replace everything after it</option>
+            <option value="overwrite">Overwrite only as long as the new take</option>
+            <option value="insert">Insert and push the rest later</option>
+          </select>
+        </label>
+        <label class="check"><input type="checkbox" id="preroll" checked> Play 2 seconds before recording starts</label>
+      </div>
+    </section>
+
+    <section class="edit-bar" aria-label="Editing">
+      <div class="group">
+        <button class="btn" id="btnUndo" type="button" disabled>Undo</button>
+        <button class="btn" id="btnRedo" type="button" disabled>Redo</button>
+      </div>
+      <div class="group">
+        <button class="btn" id="btnDelete" type="button" disabled>Delete selection</button>
+        <button class="btn" id="btnKeep" type="button" disabled>Keep only selection</button>
+        <button class="btn" id="btnSelectAll" type="button" disabled>Select all</button>
+      </div>
+      <div class="group">
+        <button class="btn" id="btnPauses" type="button" disabled>Shorten long pauses</button>
+      </div>
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="panels">
+      <!-- Enhance -->
+      <div class="panel" id="enhancePanel">
+        <h2>Enhance voice</h2>
+        <p class="sub">Removes background noise with AI, shapes the tone and sets broadcast loudness. Processing happens on your device.</p>
+        <div class="presets" id="presets" role="radiogroup" aria-label="Enhancement presets"></div>
+        <label class="field">
+          <span>Strength <output id="intensityOut">100%</output></span>
+          <input type="range" id="intensity" min="0" max="100" value="100">
+        </label>
+        <label class="field">
+          <span>Loudness target</span>
+          <select id="target"></select>
+        </label>
+        <details class="fine">
+          <summary>Fine-tune</summary>
+          <div class="sliders" id="sliders"></div>
+        </details>
+        <div class="row">
+          <button class="btn primary" id="btnPreview" type="button" disabled>Preview enhancement</button>
+          <button class="btn ghost" id="btnCancelEnhance" type="button" hidden>Cancel</button>
+        </div>
+        <div class="progress" id="enhanceProgress" hidden><div class="bar"></div><span class="plabel"></span></div>
+        <div class="ab" id="abBox" hidden>
+          <div class="seg" role="radiogroup" aria-label="Compare versions">
+            <button type="button" role="radio" id="abOriginal" aria-checked="false">Original</button>
+            <button type="button" role="radio" id="abEnhanced" aria-checked="true">Enhanced</button>
+          </div>
+          <p class="report" id="enhanceReport"></p>
+          <div class="row">
+            <button class="btn primary" id="btnApply" type="button">Apply enhancement</button>
+            <button class="btn ghost" id="btnDiscard" type="button">Discard</button>
+          </div>
+          <p class="hint">Press B to switch between versions while it plays.</p>
+        </div>
+      </div>
+
+      <!-- Export -->
+      <div class="panel" id="exportPanel">
+        <h2>Export</h2>
+        <div class="formats" role="radiogroup" aria-label="File format" id="formats">
+          <label><input type="radio" name="fmt" value="wav" checked><span><b>WAV</b> Uncompressed master</span></label>
+          <label><input type="radio" name="fmt" value="flac"><span><b>FLAC</b> Lossless, about half the size</span></label>
+          <label><input type="radio" name="fmt" value="mp3"><span><b>MP3</b> Plays everywhere</span></label>
+          <label id="opusOption"><input type="radio" name="fmt" value="opus"><span><b>Opus</b> Smallest at high quality</span></label>
+        </div>
+        <div class="opts">
+          <label class="field" id="optBits"><span>Bit depth</span>
+            <select id="bits"><option value="16">16-bit (CD)</option><option value="24" selected>24-bit (studio)</option><option value="32">32-bit float</option></select>
+          </label>
+          <label class="field" id="optKbps" hidden><span>Quality</span>
+            <select id="kbps"></select>
+          </label>
+          <label class="field" id="optRate"><span>Sample rate</span>
+            <select id="rate"><option value="0">Same as recording</option><option value="44100">44.1 kHz</option><option value="48000">48 kHz</option></select>
+          </label>
+          <label class="field" title="Mono is best for a single voice and halves the file size"><span>Channels</span>
+            <select id="channels"><option value="1">Mono</option><option value="2">Stereo</option></select>
+          </label>
+        </div>
+        <label class="check"><input type="checkbox" id="exportSel" disabled> Export only the selection</label>
+        <label class="check" id="useEnhancedRow" hidden><input type="checkbox" id="useEnhanced" checked> Use the enhanced version</label>
+        <p class="estimate" id="estimate"></p>
+        <button class="btn primary wide" id="btnExport" type="button" disabled>Export WAV</button>
+        <div class="progress" id="exportProgress" hidden><div class="bar"></div><span class="plabel"></span></div>
+        <p class="export-done" id="exportDone" hidden></p>
+      </div>
+
+      <!-- Microphone -->
+      <div class="panel" id="micPanel">
+        <h2>Microphone</h2>
+        <label class="field"><span>Input</span>
+          <select id="device"><option value="">Default microphone</option></select>
+        </label>
+        <div class="meter" aria-hidden="true"><div class="meter-fill" id="meterFill"></div><div class="meter-peak" id="meterPeak"></div></div>
+        <p class="meter-text" id="meterText">Check your level before you start.</p>
+        <button class="btn" id="btnMicTest" type="button">Check mic level</button>
+        <p class="warn" id="btWarn" hidden>Bluetooth headsets switch to low phone quality while recording. A wired or USB mic, or your device’s built-in mic, will sound much better.</p>
+        <details class="fine">
+          <summary>Advanced</summary>
+          <label class="check"><input type="checkbox" id="browserDsp"> Browser voice processing (echo and noise reduction). Leave off for the cleanest sound; use Enhance instead.</label>
+          <label class="field"><span>Latency compensation <output id="latOut"></output></span>
+            <input type="range" id="latency" min="0" max="300" step="5">
+          </label>
+          <p class="hint">Lines up a punch-in with what you heard during the 2-second run-up. Raise it if new takes start slightly late.</p>
+          <p class="hint" id="storageInfo"></p>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="helpDialog" class="dialog">
+    <form method="dialog">
+      <h2>How Takeflow works</h2>
+      <p>Record, stop when you make a mistake, click just before it (or stop playback there) and press record again. The new take replaces what came after, with a smooth, click-free join. Drag across the waveform to select, then delete or re-record just that part.</p>
+      <h3>Keyboard</h3>
+      <table class="keys">
+        <tr><td><kbd>R</kbd></td><td>Start or stop recording</td></tr>
+        <tr><td><kbd>Space</kbd></td><td>Play or stop (stopping moves the cursor there)</td></tr>
+        <tr><td><kbd>Esc</kbd></td><td>Stop, discard the take being recorded, or clear the selection</td></tr>
+        <tr><td><kbd>Delete</kbd></td><td>Delete the selection</td></tr>
+        <tr><td><kbd>Ctrl</kbd> <kbd>Z</kbd> / <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>Z</kbd></td><td>Undo / redo</td></tr>
+        <tr><td><kbd>Ctrl</kbd> <kbd>A</kbd></td><td>Select all</td></tr>
+        <tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>Move the cursor 1 second (hold Shift for 5)</td></tr>
+        <tr><td><kbd>Home</kbd> / <kbd>End</kbd></td><td>Jump to start or end</td></tr>
+        <tr><td><kbd>+</kbd> <kbd>−</kbd> <kbd>0</kbd></td><td>Zoom in, zoom out, show all</td></tr>
+        <tr><td><kbd>B</kbd></td><td>Compare original and enhanced</td></tr>
+        <tr><td>Ctrl + scroll</td><td>Zoom at the pointer</td></tr>
+      </table>
+      <h3>Privacy</h3>
+      <p>Your audio never leaves this device. It is saved in your browser so a closed tab or crash does not lose a take. Use New recording to erase it.</p>
+      <div class="row end"><button class="btn primary" value="close">Close</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="pauseDialog" class="dialog">
+    <form method="dialog">
+      <h2>Shorten long pauses</h2>
+      <p>Finds silent gaps and trims them so the pacing stays natural. You can undo this.</p>
+      <label class="field"><span>Pauses longer than</span>
+        <select id="pauseMax"><option value="0.7">0.7 seconds</option><option value="1" selected>1 second</option><option value="1.5">1.5 seconds</option><option value="2">2 seconds</option></select>
+      </label>
+      <label class="field"><span>become</span>
+        <select id="pauseKeep"><option value="0.3">0.3 seconds</option><option value="0.5" selected>0.5 seconds</option><option value="0.7">0.7 seconds</option></select>
+      </label>
+      <div class="row end">
+        <button class="btn ghost" value="cancel">Cancel</button>
+        <button class="btn primary" value="ok" id="pauseOk">Shorten pauses</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="confirmDialog" class="dialog">
+    <form method="dialog">
+      <h2 id="confirmTitle"></h2>
+      <p id="confirmText"></p>
+      <div class="row end">
+        <button class="btn ghost" value="cancel">Cancel</button>
+        <button class="btn danger" value="ok" id="confirmOk">OK</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <noscript><p class="noscript">Takeflow needs JavaScript to record and edit audio.</p></noscript>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
