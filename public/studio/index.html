@@ -1,0 +1,635 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0a14">
+<title>Amusing Audio Studio — Timeline recorder & editor</title>
+<meta name="description" content="Record, cut, delete and re-record on a real timeline. Private, in your browser.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%237c5cff'/%3E%3Cpath d='M8 17v-2M12 21V11M16 24V8M20 21V11M24 17v-2' stroke='white' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0a14; --panel:rgba(255,255,255,.045); --panel-2:rgba(255,255,255,.075);
+  --line:rgba(255,255,255,.09); --text:#f1f1f8; --muted:#9a9ab5;
+  --a1:#7c5cff; --a2:#ff4fa3; --a3:#ffb547; --rec:#ff3b5c; --ok:#3ddc97;
+  --grad:linear-gradient(135deg,var(--a1),var(--a2) 60%,var(--a3));
+  --r:20px;
+}
+*{box-sizing:border-box;margin:0}
+html,body{min-height:100%}
+body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before,body::after{content:"";position:fixed;z-index:-1;width:60vmax;height:60vmax;border-radius:50%;filter:blur(120px);opacity:.28;pointer-events:none}
+body::before{background:var(--a1);top:-25vmax;left:-15vmax}
+body::after{background:var(--a2);bottom:-30vmax;right:-20vmax;opacity:.2}
+svg.i{width:1.15em;height:1.15em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+svg.i.f{fill:currentColor;stroke:none}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--a1);outline-offset:2px}
+
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px clamp(16px,3vw,32px);position:sticky;top:0;z-index:20;backdrop-filter:blur(18px);background:rgba(10,10,20,.6);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:12px;font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:1.15rem;letter-spacing:-.01em}
+.logo{width:38px;height:38px;border-radius:12px;background:var(--grad);display:grid;place-items:center;box-shadow:0 8px 26px -6px var(--a1)}
+.logo svg{width:22px;height:22px;stroke:#fff;stroke-width:2.6}
+.brand small{display:block;font:500 .72rem Inter;color:var(--muted);letter-spacing:.02em}
+.hdr-actions{display:flex;gap:10px;align-items:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;border-radius:12px;background:var(--panel-2);border:1px solid var(--line);font-weight:600;font-size:.9rem;transition:.18s;white-space:nowrap}
+.btn:hover:not(:disabled){background:rgba(255,255,255,.12);transform:translateY(-1px)}
+.btn:disabled{opacity:.38;cursor:not-allowed}
+.btn.primary{background:var(--grad);border:0;box-shadow:0 10px 30px -10px var(--a2)}
+.btn.primary:hover:not(:disabled){filter:brightness(1.1)}
+.btn.icon{padding:10px;aspect-ratio:1}
+.btn.danger{border-color:rgba(255,59,92,.4);color:#ff8da1}
+.btn.wide{width:100%}
+
+main{display:grid;grid-template-columns:minmax(290px,350px) 1fr;gap:20px;padding:20px clamp(16px,3vw,32px) 60px;max-width:1600px;margin:0 auto}
+@media(max-width:980px){main{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px;backdrop-filter:blur(14px);position:relative}
+.card h2{font:700 .78rem Inter;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.col{display:flex;flex-direction:column;gap:20px;min-width:0}
+
+/* recorder */
+.rec-stage{display:flex;flex-direction:column;align-items:center;gap:14px;padding:6px 0 4px}
+#scope{width:100%;height:76px;border-radius:14px;background:rgba(0,0,0,.28);border:1px solid var(--line)}
+.timer{font:700 2.4rem "Space Grotesk",sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.timer.live{color:var(--rec)}
+.meter{width:100%;height:6px;background:rgba(255,255,255,.08);border-radius:9px;overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--ok),var(--a3) 70%,var(--rec));border-radius:9px;transition:width .06s}
+.rec-row{display:flex;align-items:center;gap:18px}
+.recbtn{width:84px;height:84px;border-radius:50%;background:radial-gradient(circle at 30% 25%,#ff7b93,var(--rec));display:grid;place-items:center;color:#fff;box-shadow:0 14px 40px -8px var(--rec),inset 0 -6px 14px rgba(0,0,0,.25);transition:.2s}
+.recbtn svg{width:34px;height:34px}
+.recbtn:hover{transform:scale(1.06)}
+.recbtn.on{animation:pulse 1.5s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,59,92,.6),0 14px 40px -8px var(--rec)}100%{box-shadow:0 0 0 26px rgba(255,59,92,0),0 14px 40px -8px var(--rec)}}
+.sm{width:52px;height:52px;border-radius:50%;background:var(--panel-2);border:1px solid var(--line);display:grid;place-items:center;transition:.18s}
+.sm:hover:not(:disabled){background:rgba(255,255,255,.14)}
+.sm:disabled{opacity:.3;cursor:not-allowed}
+.recat{font-size:.84rem;color:var(--muted);text-align:center;line-height:1.5}
+.recat b{color:var(--a3);font-variant-numeric:tabular-nums}
+.field{display:flex;flex-direction:column;gap:6px;margin-top:14px;font-size:.8rem;color:var(--muted)}
+select{width:100%;padding:11px 12px;border-radius:12px;background:rgba(0,0,0,.3);color:var(--text);border:1px solid var(--line);font:inherit;font-size:.88rem}
+.toggles{display:grid;gap:12px;margin-top:14px}
+.sw{display:flex;align-items:center;justify-content:space-between;font-size:.88rem;cursor:pointer;gap:10px}
+.sw span small{display:block;color:var(--muted);font-size:.74rem;margin-top:2px}
+input[type=checkbox]{appearance:none;-webkit-appearance:none;width:42px;height:24px;border-radius:99px;background:rgba(255,255,255,.14);position:relative;transition:.2s;cursor:pointer;flex:none}
+input[type=checkbox]::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s}
+input[type=checkbox]:checked{background:var(--a1)}
+input[type=checkbox]:checked::after{transform:translateX(18px)}
+
+/* editor */
+.toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:12px}
+.tb-group{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.seg{display:inline-flex;background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:4px;gap:4px}
+.seg button{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;font-weight:600;font-size:.86rem;color:var(--muted);transition:.15s}
+.seg button:hover:not(:disabled){color:var(--text);background:rgba(255,255,255,.08)}
+.seg button.active{background:var(--grad);color:#fff;box-shadow:0 6px 20px -8px var(--a2)}
+.seg button:disabled{opacity:.35;cursor:not-allowed}
+.seg kbd{opacity:.8;background:rgba(0,0,0,.25);border-color:transparent}
+.pill{display:inline-flex;align-items:center;gap:10px;padding:7px 8px 7px 14px;border:1px solid var(--line);background:var(--panel-2);border-radius:99px;font-size:.82rem;font-weight:600;cursor:pointer}
+.clock{font:600 1.35rem "Space Grotesk",sans-serif;font-variant-numeric:tabular-nums;padding:0 8px}
+.clock small{color:var(--muted);font-size:.9rem;font-weight:500}
+.tl-wrap{position:relative;border-radius:16px;overflow:hidden;background:rgba(0,0,0,.32);border:1px solid var(--line)}
+#tl{display:block;width:100%;height:260px;cursor:default;touch-action:none}
+.empty{position:absolute;left:0;right:0;top:30px;bottom:0;display:grid;place-items:center;text-align:center;color:var(--muted);padding:20px;pointer-events:none}
+.empty b{display:block;color:var(--text);font:700 1.15rem "Space Grotesk";margin-bottom:6px}
+.empty .ring{width:58px;height:58px;border-radius:18px;background:var(--grad);display:grid;place-items:center;margin:0 auto 14px;color:#fff;opacity:.9}
+.empty .ring svg{width:28px;height:28px}
+.drop{outline:2px dashed var(--a1);outline-offset:-10px}
+#hscroll{width:100%;margin-top:12px;accent-color:var(--a1)}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.chip{padding:6px 12px;border-radius:99px;background:var(--panel-2);border:1px solid var(--line);font-size:.78rem;color:var(--muted)}
+.chip b{color:var(--text);font-weight:600}
+.hint{margin-top:14px;font-size:.82rem;color:var(--muted);line-height:1.55}
+.hint b{color:var(--text)}
+.keys{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px 18px;font-size:.84rem;color:var(--muted)}
+kbd{padding:2px 6px;border-radius:6px;background:var(--panel-2);border:1px solid var(--line);font:inherit;font-size:.72rem;color:var(--text)}
+
+dialog{margin:auto;background:#161626;color:var(--text);border:1px solid var(--line);border-radius:20px;padding:26px;width:min(420px,92vw);box-shadow:0 30px 80px rgba(0,0,0,.6)}
+dialog::backdrop{background:rgba(5,5,12,.62);backdrop-filter:blur(4px)}
+dialog h3{font:700 1.2rem "Space Grotesk";margin-bottom:10px}
+dialog p{color:var(--muted);font-size:.9rem;line-height:1.55;margin-bottom:20px}
+dialog .row{display:flex;gap:10px;justify-content:flex-end}
+
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,30px);background:#1c1c2e;border:1px solid var(--line);padding:12px 18px;border-radius:14px;font-size:.88rem;opacity:0;pointer-events:none;transition:.25s;z-index:50;box-shadow:0 14px 40px rgba(0,0,0,.5);max-width:90vw}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast.err{border-color:var(--rec)}
+footer{text-align:center;color:var(--muted);font-size:.78rem;padding:0 16px 30px}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="logo"><svg class="i" viewBox="0 0 24 24"><path d="M4 13v-2M8 17V7M12 21V3M16 17V7M20 13v-2"/></svg></div>
+    <div>Amusing Audio Studio<small>Record · Cut · Re-record — private, in your browser</small></div>
+  </div>
+  <div class="hdr-actions">
+    <button class="btn" id="importBtn"><i data-i="upload"></i><span>Import</span></button>
+    <button class="btn primary" id="exportBtn" disabled><i data-i="download"></i><span>Export WAV</span></button>
+    <input type="file" id="file" accept="audio/*,video/*" hidden>
+  </div>
+</header>
+
+<main>
+  <div class="col">
+    <section class="card">
+      <h2><i data-i="mic"></i> Recorder</h2>
+      <div class="rec-stage">
+        <canvas id="scope"></canvas>
+        <div class="timer" id="recTime">0:00.0</div>
+        <div class="meter"><i id="lvl"></i></div>
+        <div class="rec-row">
+          <button class="sm" id="pauseRec" disabled title="Pause / resume"><i data-i="pause"></i></button>
+          <button class="recbtn" id="recBtn" title="Record at the playhead (R)"><i data-i="mic"></i></button>
+          <button class="sm" id="stopRec" disabled title="Stop"><i data-i="stop"></i></button>
+        </div>
+        <div class="recat" id="recAt">Records at the playhead <b>0:00.0</b></div>
+        <button class="btn danger wide" id="newBtn"><i data-i="trash"></i>New recording…</button>
+      </div>
+      <label class="field">Microphone
+        <select id="devices"><option value="">Default microphone</option></select>
+      </label>
+      <div class="toggles">
+        <label class="sw"><span>Noise suppression<small>Reduces background hiss</small></span><input type="checkbox" id="ns" checked></label>
+        <label class="sw"><span>Echo cancellation<small>Best when using speakers</small></span><input type="checkbox" id="ec" checked></label>
+        <label class="sw"><span>Auto gain<small>Evens out loud &amp; quiet voice</small></span><input type="checkbox" id="ag"></label>
+      </div>
+    </section>
+    <section class="card">
+      <h2>Shortcuts</h2>
+      <div class="keys" style="grid-template-columns:1fr">
+        <div><kbd>C</kbd> cutter tool — click to cut</div>
+        <div><kbd>S</kbd> select tool</div>
+        <div><kbd>K</kbd> cut at the playhead</div>
+        <div><kbd>Del</kbd> delete selection</div>
+        <div><kbd>Ctrl</kbd>+<kbd>Z</kbd> undo · <kbd>Ctrl</kbd>+<kbd>Y</kbd> redo</div>
+        <div><kbd>Space</kbd> play / pause · <kbd>R</kbd> record</div>
+        <div><kbd>Ctrl</kbd>+<kbd>A</kbd> select all · <kbd>Esc</kbd> deselect</div>
+        <div><kbd>←</kbd> <kbd>→</kbd> nudge playhead · <kbd>Ctrl</kbd>+scroll zoom</div>
+      </div>
+    </section>
+  </div>
+
+  <div class="col">
+    <section class="card" id="editor">
+      <h2>Timeline</h2>
+      <div class="toolbar">
+        <div class="tb-group">
+          <div class="seg" role="toolbar" aria-label="Tools">
+            <button id="toolSel" class="active" title="Select (S)"><i data-i="cursor"></i>Select <kbd>S</kbd></button>
+            <button id="toolCut" title="Cutter (C)"><i data-i="scissors"></i>Cut <kbd>C</kbd></button>
+            <button id="btnSplit" title="Cut at playhead (K)" disabled><i data-i="split"></i>Split</button>
+            <button id="btnDel" title="Delete selection (Del)" disabled><i data-i="trash"></i>Delete</button>
+          </div>
+        </div>
+        <div class="tb-group">
+          <button class="btn icon" id="undoBtn" disabled title="Undo (Ctrl+Z)"><i data-i="undo"></i></button>
+          <button class="btn icon" id="redoBtn" disabled title="Redo (Ctrl+Y)"><i data-i="redo"></i></button>
+          <button class="btn icon" id="zoomOut" title="Zoom out"><i data-i="zout"></i></button>
+          <button class="btn icon" id="zoomIn" title="Zoom in"><i data-i="zin"></i></button>
+          <button class="btn icon" id="fitBtn" title="Fit to content"><i data-i="fit"></i></button>
+        </div>
+      </div>
+      <div class="toolbar">
+        <div class="tb-group">
+          <button class="btn icon primary" id="playBtn" disabled title="Play / pause (Space)"><i data-i="play"></i></button>
+          <button class="btn icon" id="stopBtn" disabled title="Stop"><i data-i="stop"></i></button>
+          <div class="clock" id="clock">0:00.00</div>
+        </div>
+        <div class="tb-group">
+          <label class="pill" title="On: deleting closes the gap and new takes push the rest to the right. Off: cuts leave empty space."><span>Fill gaps</span><input type="checkbox" id="ripple" checked></label>
+          <label class="pill" title="Snap cuts and selections to the playhead and clip edges"><span>Snap</span><input type="checkbox" id="snap" checked></label>
+        </div>
+      </div>
+      <div class="tl-wrap" id="tlWrap">
+        <canvas id="tl"></canvas>
+        <div class="empty" id="empty"><div><div class="ring"><i data-i="mic"></i></div><b>Empty timeline</b>Press the red button to record, or drop an audio file anywhere.</div></div>
+      </div>
+      <input type="range" id="hscroll" min="0" max="1000" value="0" disabled aria-label="Scroll timeline">
+      <div class="stats">
+        <span class="chip">Length <b id="sLen">0:00.0</b></span>
+        <span class="chip">Clips <b id="sClips">0</b></span>
+        <span class="chip">Selected <b id="sSel">nothing</b></span>
+      </div>
+      <p class="hint" id="modeHint"></p>
+    </section>
+  </div>
+</main>
+<footer>Everything runs locally in your browser — your audio is never uploaded. Closing the tab discards the project, so export first. Made for Amusing Study Hall.</footer>
+<div class="toast" id="toast"></div>
+
+<dialog id="dlg">
+  <form method="dialog">
+    <h3 id="dlgT"></h3><p id="dlgP"></p>
+    <div class="row"><button class="btn" value="no">Cancel</button><button class="btn primary" value="yes" id="dlgOk">Continue</button></div>
+  </form>
+</dialog>
+
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const EPS = 0.004;     // seconds; edits smaller than this are ignored
+const RULER = 30;      // css px
+
+/* ---------- icons ---------- */
+const ICONS = {
+  mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+  play:'<path d="M7 4l13 8-13 8z"/>', pause:'<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>',
+  stop:'<rect x="6" y="6" width="12" height="12" rx="2"/>',
+  upload:'<path d="M12 16V4M7 9l5-5 5 5M4 20h16"/>', download:'<path d="M12 4v12M7 11l5 5 5-5M4 20h16"/>',
+  undo:'<path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/>', redo:'<path d="M15 14l5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/>',
+  scissors:'<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4L8.1 15.9M14.5 14.5L20 20M8.1 8.1L12 12"/>',
+  trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+  zin:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5M11 8v6M8 11h6"/>', zout:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5M8 11h6"/>',
+  fit:'<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
+  cursor:'<path d="M5 3l14 7-6 2-2 6z"/>', split:'<path d="M12 3v18M7 8l-4 4 4 4M17 8l4 4-4 4"/>'
+};
+const FILLED = k => k==='play'||k==='pause'||k==='stop';
+document.querySelectorAll('i[data-i]').forEach(el=>{
+  const k=el.dataset.i;
+  el.outerHTML=`<svg class="i${FILLED(k)?' f':''}" viewBox="0 0 24 24">${ICONS[k]}</svg>`;
+});
+const setIcon=(btn,k)=>{const s=btn.querySelector('svg');s.setAttribute('class','i'+(FILLED(k)?' f':''));s.innerHTML=ICONS[k];};
+
+/* ---------- audio context ---------- */
+let actx=null;
+const getCtx=()=>actx||(actx=new (window.AudioContext||window.webkitAudioContext)());
+
+/*MODEL-START*/
+/* A project is a list of clips on one timeline.
+   clip = { id, src, a, b, t }  → plays src.buf from a..b (seconds) starting at timeline time t.
+   Clips never overlap. Gaps between clips are silence. Source audio is never modified. */
+let _nid=1; const uid=()=>'c'+(_nid++);
+const len=c=>c.b-c.a;
+const endOf=c=>c.t+(c.b-c.a);
+const S={clips:[],undo:[],redo:[],head:0,view:0,pps:60,tool:'select',sel:new Set(),range:null,
+  ripple:true,snap:true,hover:null,playing:false,srcs:[],t0:0,off:0,from:0,recAt:0};
+
+function contentEnd(){let e=0;for(const c of S.clips)e=Math.max(e,endOf(c));return e}
+function clipAt(t){return S.clips.find(c=>t>=c.t&&t<endOf(c))}
+function contig(p,n){return p.src===n.src&&Math.abs(p.b-n.a)<1e-6&&Math.abs(endOf(p)-n.t)<1e-6}
+function pruneSel(){const ids=new Set(S.clips.map(c=>c.id));for(const id of [...S.sel])if(!ids.has(id))S.sel.delete(id)}
+
+/* every change goes through edit(): works on a copy, so undo is just swapping arrays */
+function edit(fn,msg){
+  if(R.active){toast('Stop recording first',1);return false}
+  const next=S.clips.map(c=>({...c}));
+  if(fn(next)===false)return false;
+  S.undo.push(S.clips);if(S.undo.length>200)S.undo.shift();S.redo=[];
+  S.clips=next.filter(c=>len(c)>EPS).sort((x,y)=>x.t-y.t);
+  pruneSel();pausePlayback();ui();if(msg)toast(msg);return true}
+function undo(){if(R.active||!S.undo.length)return;S.redo.push(S.clips);S.clips=S.undo.pop();S.range=null;pruneSel();pausePlayback();ui();toast('Undo')}
+function redo(){if(R.active||!S.redo.length)return;S.undo.push(S.clips);S.clips=S.redo.pop();S.range=null;pruneSel();pausePlayback();ui();toast('Redo')}
+
+function splitIn(arr,t){
+  const c=arr.find(c=>c.t+EPS<t&&endOf(c)-EPS>t);if(!c)return false;
+  const cut=c.a+(t-c.t),r={...c,id:uid(),a:cut,t:t};c.b=cut;arr.push(r);return true}
+
+function opSplit(t){
+  if(!edit(a=>splitIn(a,t),'Cut at '+fmt(t)))toast('Nothing to cut there — click on a clip',1)}
+
+function opDeleteRange(a,b){
+  if(b-a<EPS)return;const d=b-a;
+  const ok=edit(arr=>{
+    splitIn(arr,a);splitIn(arr,b);
+    const rem=arr.filter(c=>c.t>=a-EPS&&endOf(c)<=b+EPS);
+    if(!rem.length&&!S.ripple)return false;
+    const keep=arr.filter(c=>!rem.includes(c));arr.length=0;arr.push(...keep);
+    if(S.ripple)arr.forEach(c=>{if(c.t>=b-EPS)c.t-=d});
+  },S.ripple?'Deleted — gap closed':'Deleted — empty space left');
+  if(ok){S.head=a;S.range=null}return ok}
+
+function opDeleteClips(ids){
+  let first=Infinity;
+  const ok=edit(arr=>{
+    const rem=arr.filter(c=>ids.has(c.id));if(!rem.length)return false;
+    rem.sort((x,y)=>y.t-x.t);
+    for(const r of rem){first=Math.min(first,r.t);arr.splice(arr.indexOf(r),1);
+      if(S.ripple){const d=len(r),e=r.t+d;arr.forEach(c=>{if(c.t>=e-EPS)c.t-=d})}}
+  },S.ripple?'Deleted — gap closed':'Deleted — empty space left');
+  if(ok){S.head=first;S.sel.clear()}return ok}
+
+/* new audio (a recording or an imported file) goes in at `at`; nothing is overwritten */
+function insertSource(src,at){
+  const L=src.buf.duration;
+  edit(arr=>{
+    splitIn(arr,at);
+    const later=arr.filter(c=>c.t>=at-EPS);
+    let shift=0;
+    if(S.ripple)shift=L;                                   // push everything after it to the right
+    else if(later.length)shift=Math.max(0,at+L-Math.min(...later.map(c=>c.t))); // only as far as needed
+    later.forEach(c=>c.t+=shift);
+    arr.push({id:uid(),src,a:0,b:L,t:at});
+  });
+  S.head=at+L}
+/*MODEL-END*/
+
+function fmt(t,d=2){t=Math.max(0,t);const m=Math.floor(t/60);const s=(t-m*60).toFixed(d).padStart(d?3+d:2,'0');return m+':'+s}
+function toast(msg,err){const t=$('#toast');t.textContent=msg;t.className='toast show'+(err?' err':'');clearTimeout(toast.t);toast.t=setTimeout(()=>t.className='toast',2800)}
+
+function makeSrc(buf,name){
+  const PK=256,n=Math.ceil(buf.length/PK),p=new Float32Array(n);
+  for(let c=0;c<buf.numberOfChannels;c++){const d=buf.getChannelData(c);
+    for(let i=0;i<n;i++){let m=p[i];const e=Math.min(buf.length,(i+1)*PK);for(let j=i*PK;j<e;j++){const v=Math.abs(d[j]);if(v>m)m=v}p[i]=m}}
+  return {buf,name,peaks:p,PK}}
+
+async function confirmDlg(title,text,ok){
+  const d=$('#dlg');if(!d.showModal)return window.confirm(title+'\n\n'+text);
+  $('#dlgT').textContent=title;$('#dlgP').textContent=text;$('#dlgOk').textContent=ok||'Continue';d.returnValue='';
+  return new Promise(res=>{d.addEventListener('close',()=>res(d.returnValue==='yes'),{once:true});d.showModal()})}
+
+/* ---------- playback ---------- */
+function stopSrcs(){for(const s of S.srcs){try{s.onended=null;s.stop()}catch(e){}}S.srcs=[]}
+function play(){
+  if(!S.clips.length||R.active)return;
+  const c=getCtx();c.resume();stopSrcs();
+  let from=S.head;if(from>=contentEnd()-0.01)from=0;
+  S.head=from;S.from=from;S.off=from;S.t0=c.currentTime+0.06;S.playing=true;
+  S.clips.forEach((cl,i)=>{
+    const e=endOf(cl);if(e<=from)return;
+    const st=Math.max(from,cl.t),off=cl.a+(st-cl.t),dur=e-st,when=S.t0+(st-from);
+    const src=c.createBufferSource();src.buffer=cl.src.buf;
+    const gn=c.createGain();src.connect(gn);gn.connect(c.destination);
+    const f=Math.min(0.004,dur/3),p=S.clips[i-1],n=S.clips[i+1];
+    const fadeIn=st===cl.t&&!(p&&contig(p,cl)),fadeOut=!(n&&contig(cl,n));
+    gn.gain.setValueAtTime(fadeIn?0:1,when);
+    if(fadeIn)gn.gain.linearRampToValueAtTime(1,when+f);
+    if(fadeOut){gn.gain.setValueAtTime(1,when+dur-f);gn.gain.linearRampToValueAtTime(0,when+dur)}
+    src.start(when,off,dur);S.srcs.push(src)});
+  ui()}
+function pausePlayback(){if(!S.playing)return;S.head=Math.max(S.from,S.off+(getCtx().currentTime-S.t0));stopSrcs();S.playing=false;ui()}
+function stopPlayback(){const was=S.playing;stopSrcs();S.playing=false;if(was||true)S.head=S.from;ui()}
+function setHead(t){S.head=Math.max(0,t);if(S.playing)play();ui()}
+$('#playBtn').onclick=()=>S.playing?pausePlayback():play();
+$('#stopBtn').onclick=stopPlayback;
+
+/* ---------- timeline drawing ---------- */
+const cv=$('#tl'),g=cv.getContext('2d');
+const TL=()=>Math.max(30,contentEnd()+10,S.head+10);
+function rr(x,y,w,h,r){r=Math.max(0,Math.min(r,w/2,h/2));g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
+function draw(){
+  const r=cv.getBoundingClientRect(),dpr=devicePixelRatio||1,W=r.width,H=r.height;
+  const pw=Math.round(W*dpr),ph=Math.round(H*dpr);if(cv.width!==pw||cv.height!==ph){cv.width=pw;cv.height=ph}
+  g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,W,H);
+  const vis=W/S.pps;S.view=clamp(S.view,0,Math.max(0,TL()-vis));
+  const t2x=t=>(t-S.view)*S.pps;
+  g.fillStyle='rgba(255,255,255,.03)';g.fillRect(0,RULER,W,H-RULER);
+  g.fillStyle='rgba(255,255,255,.04)';g.fillRect(0,0,W,RULER);
+
+  // ruler
+  const steps=[.01,.02,.05,.1,.2,.5,1,2,5,10,15,30,60,120,300,600,1800,3600];
+  const step=steps.find(s=>s*S.pps>=90)||3600,minor=step/5;
+  g.font='11px Inter,system-ui,sans-serif';g.textBaseline='middle';
+  for(let i=Math.floor(S.view/minor);i*minor<=S.view+vis+minor;i++){
+    const t=i*minor,x=Math.round(t2x(t))+.5,major=i%5===0;
+    g.fillStyle=major?'rgba(255,255,255,.07)':'rgba(255,255,255,.18)';
+    if(major){g.fillRect(x,RULER,1,H-RULER);g.fillStyle='rgba(255,255,255,.18)';g.fillRect(x,RULER-12,1,12);g.fillStyle='rgba(255,255,255,.55)';g.fillText(fmt(t,step<1?2:0),x+5,RULER/2-1)}
+    else g.fillRect(x,RULER-5,1,5)}
+
+  // clips
+  const y=RULER+10,h=H-RULER-20;
+  for(const c of S.clips){
+    const x1=t2x(c.t),x2=t2x(endOf(c));if(x2<-5||x1>W+5)continue;
+    const sel=S.sel.has(c.id);
+    g.save();rr(x1,y,x2-x1,h,10);
+    const gr=g.createLinearGradient(0,y,0,y+h);
+    gr.addColorStop(0,sel?'rgba(150,120,255,.6)':'rgba(124,92,255,.4)');gr.addColorStop(1,sel?'rgba(255,79,163,.5)':'rgba(255,79,163,.25)');
+    g.fillStyle=gr;g.fill();g.clip();
+    const mid=y+h/2+8,amp=(h-30)/2,pk=c.src.peaks,PK=c.src.PK,sr=c.src.buf.sampleRate;
+    g.fillStyle=sel?'#ffffff':'rgba(255,255,255,.82)';
+    for(let x=Math.max(0,Math.floor(x1));x<Math.min(W,Math.ceil(x2));x+=3){
+      const s0=c.a+(S.view+x/S.pps-c.t),s1=c.a+(S.view+(x+2)/S.pps-c.t);
+      const i0=Math.max(0,Math.floor(s0*sr/PK)),i1=Math.min(pk.length-1,Math.max(i0,Math.floor(s1*sr/PK)));
+      let m=0;const st=Math.max(1,Math.floor((i1-i0)/24));for(let i=i0;i<=i1;i+=st)if(pk[i]>m)m=pk[i];
+      const hh=Math.max(1,Math.pow(Math.min(1,m),.65)*amp);g.fillRect(x,mid-hh,2,hh*2)}
+    g.restore();
+    rr(x1+.5,y+.5,x2-x1-1,h-1,10);g.lineWidth=sel?2:1;g.strokeStyle=sel?'#fff':'rgba(255,255,255,.22)';g.stroke();
+    if(x2-x1>56){g.save();g.beginPath();g.rect(Math.max(0,x1),y,x2-Math.max(0,x1),22);g.clip();
+      g.fillStyle='rgba(255,255,255,.9)';g.fillText(c.src.name,Math.max(x1,0)+10,y+12);g.restore()}}
+
+  // range selection
+  if(S.range){const x1=t2x(S.range.a),x2=t2x(S.range.b);g.fillStyle='rgba(61,214,255,.16)';g.fillRect(x1,RULER,x2-x1,H-RULER);
+    g.fillStyle='#3dd6ff';g.fillRect(x1-1,RULER,2,H-RULER);g.fillRect(x2-1,RULER,2,H-RULER)}
+
+  // live recording block
+  if(R.active){const x1=t2x(S.recAt),x2=t2x(S.recAt+recElapsed());
+    g.fillStyle='rgba(255,59,92,.25)';g.fillRect(x1,y,Math.max(2,x2-x1),h);g.strokeStyle='#ff3b5c';g.lineWidth=1.5;g.strokeRect(x1+.5,y+.5,Math.max(2,x2-x1)-1,h-1);
+    g.fillStyle='#ffd0d8';g.fillText(R.paused?'Paused':'Recording…',x1+10,y+12)}
+
+  // cutter guide
+  if(S.tool==='cut'&&S.hover!==null&&!R.active){const x=Math.round(t2x(S.hover))+.5;
+    g.save();g.setLineDash([5,4]);g.strokeStyle='#ff3b5c';g.lineWidth=1.5;g.beginPath();g.moveTo(x,RULER);g.lineTo(x,H);g.stroke();g.restore();
+    g.fillStyle='#ff3b5c';g.font='15px system-ui';g.fillText('✂',x+6,RULER+16);g.font='11px Inter,system-ui,sans-serif'}
+
+  // playhead
+  const px=t2x(S.head);
+  if(px>=-8&&px<=W+8){g.fillStyle='#ffb547';g.fillRect(px-1,0,2,H);g.beginPath();g.moveTo(px-7,0);g.lineTo(px+7,0);g.lineTo(px,11);g.closePath();g.fill()}
+}
+
+/* ---------- timeline mouse ---------- */
+let drag=null;
+const xOf=e=>e.clientX-cv.getBoundingClientRect().left;
+const yOf=e=>e.clientY-cv.getBoundingClientRect().top;
+const tOf=x=>Math.max(0,S.view+x/S.pps);
+function snapT(t){
+  if(!S.snap)return t;
+  const c=[0,S.head];for(const k of S.clips){c.push(k.t,endOf(k))}
+  let best=t,bd=8/S.pps;for(const v of c){const d=Math.abs(v-t);if(d<bd){bd=d;best=v}}return best}
+
+cv.addEventListener('pointerdown',e=>{
+  if(R.active)return;cv.setPointerCapture(e.pointerId);
+  const x=xOf(e),y=yOf(e),t=tOf(x);
+  if(y<RULER){drag={mode:'scrub'};S.head=t;if(S.playing)play();return}
+  if(S.tool==='cut'){opSplit(snapT(t));return}
+  drag={mode:'pending',x0:x,t0:t,hit:clipAt(t),shift:e.shiftKey||e.ctrlKey||e.metaKey}});
+cv.addEventListener('pointermove',e=>{
+  const x=xOf(e),y=yOf(e);
+  cv.style.cursor=y<RULER?'ew-resize':(S.tool==='cut'?'crosshair':'default');
+  S.hover=y>=RULER?snapT(tOf(x)):null;
+  if(!drag)return;
+  if(drag.mode==='scrub'){S.head=tOf(x);return}
+  if(drag.mode==='pending'&&Math.abs(x-drag.x0)>4){drag.mode='range';S.sel.clear()}
+  if(drag.mode==='range'){const a=snapT(drag.t0),b=snapT(tOf(x));S.range={a:Math.min(a,b),b:Math.max(a,b)};ui()}});
+cv.addEventListener('pointerup',()=>{
+  if(!drag)return;const d=drag;drag=null;
+  if(d.mode==='scrub'){if(S.playing)play();ui();return}
+  if(d.mode==='range'){if(S.range&&S.range.b-S.range.a<0.02)S.range=null;ui();return}
+  if(d.mode==='pending'){
+    S.range=null;
+    if(d.hit){if(d.shift){S.sel.has(d.hit.id)?S.sel.delete(d.hit.id):S.sel.add(d.hit.id)}else{S.sel.clear();S.sel.add(d.hit.id)}}
+    else S.sel.clear();
+    S.head=d.t0;if(S.playing)play();ui()}});
+cv.addEventListener('pointerleave',()=>{S.hover=null});
+cv.addEventListener('wheel',e=>{
+  e.preventDefault();
+  if(e.ctrlKey||e.metaKey){zoomAt(e.deltaY<0?1.2:1/1.2,xOf(e))}
+  else{S.view+=(e.deltaX||e.deltaY)/S.pps*1.2;syncScroll()}},{passive:false});
+
+function zoomAt(f,x){const w=cv.clientWidth,cx=x===undefined?w/2:x,t=S.view+cx/S.pps;S.pps=clamp(S.pps*f,4,4000);S.view=Math.max(0,t-cx/S.pps);syncScroll()}
+$('#zoomIn').onclick=()=>zoomAt(1.5);$('#zoomOut').onclick=()=>zoomAt(1/1.5);
+$('#fitBtn').onclick=()=>{S.pps=clamp((cv.clientWidth-60)/Math.max(1,contentEnd()),4,4000);S.view=0;syncScroll()};
+const hs=$('#hscroll');
+hs.oninput=()=>{const vis=cv.clientWidth/S.pps;S.view=hs.value/1000*Math.max(0,TL()-vis)};
+function syncScroll(){const vis=cv.clientWidth/S.pps,room=Math.max(0,TL()-vis);S.view=clamp(S.view,0,room);hs.disabled=room<=0.01;hs.value=room>0?S.view/room*1000:0}
+
+/* ---------- tools & selection ---------- */
+function setTool(t){S.tool=t;ui()}
+$('#toolSel').onclick=()=>setTool('select');
+$('#toolCut').onclick=()=>setTool('cut');
+$('#btnSplit').onclick=()=>opSplit(S.head);
+function deleteSelection(){
+  if(S.range)return opDeleteRange(S.range.a,S.range.b);
+  if(S.sel.size)return opDeleteClips(new Set(S.sel));
+  toast('Select something first (S), then press Delete',1)}
+$('#btnDel').onclick=deleteSelection;
+$('#undoBtn').onclick=undo;$('#redoBtn').onclick=redo;
+$('#ripple').onchange=e=>{S.ripple=e.target.checked;ui()};
+$('#snap').onchange=e=>{S.snap=e.target.checked};
+
+/* ---------- UI sync ---------- */
+function ui(){
+  const has=S.clips.length>0,rec=R.active;
+  $('#toolSel').classList.toggle('active',S.tool==='select');$('#toolCut').classList.toggle('active',S.tool==='cut');
+  $('#btnSplit').disabled=!has||rec;$('#btnDel').disabled=!(S.range||S.sel.size)||rec;
+  $('#undoBtn').disabled=!S.undo.length||rec;$('#redoBtn').disabled=!S.redo.length||rec;
+  $('#playBtn').disabled=!has||rec;$('#stopBtn').disabled=!has||rec;$('#exportBtn').disabled=!has||rec;
+  setIcon($('#playBtn'),S.playing?'pause':'play');
+  $('#empty').style.display=has||rec?'none':'grid';
+  $('#sLen').textContent=fmt(contentEnd(),1);$('#sClips').textContent=S.clips.length;
+  $('#sSel').textContent=S.range?'range '+fmt(S.range.a)+' → '+fmt(S.range.b):S.sel.size?S.sel.size+(S.sel.size>1?' clips':' clip'):'nothing';
+  $('#recAt').innerHTML='Records at the playhead <b>'+fmt(S.head,1)+'</b>'+(has?'<br>New audio is inserted there — nothing is overwritten.':'');
+  $('#modeHint').innerHTML=S.ripple
+    ?'<b>Fill gaps is on.</b> Deleting closes the gap, and a new recording pushes everything after the playhead to the right.'
+    :'<b>Fill gaps is off.</b> Deleted parts stay as empty space, and a new recording only pushes audio if it would run into it.';
+  syncScroll()}
+
+/* ---------- recorder ---------- */
+const R={rec:null,stream:null,node:null,an:null,chunks:[],start:0,acc:0,paused:false,active:false};
+const scope=$('#scope'),sg=scope.getContext('2d');
+async function loadDevices(){try{const all=await navigator.mediaDevices.enumerateDevices(),sel=$('#devices'),cur=sel.value;
+  sel.innerHTML='<option value="">Default microphone</option>';
+  all.filter(d=>d.kind==='audioinput'&&d.deviceId&&d.deviceId!=='default').forEach((d,i)=>{const o=document.createElement('option');o.value=d.deviceId;o.textContent=d.label||'Microphone '+(i+1);sel.appendChild(o)});sel.value=cur}catch(e){}}
+if(navigator.mediaDevices&&navigator.mediaDevices.addEventListener)navigator.mediaDevices.addEventListener('devicechange',loadDevices);
+loadDevices();
+
+async function startRec(){
+  if(R.active)return;
+  if(!navigator.mediaDevices||!window.MediaRecorder)return toast('Recording is not supported in this browser',1);
+  pausePlayback();
+  try{const dev=$('#devices').value;
+    R.stream=await navigator.mediaDevices.getUserMedia({audio:{deviceId:dev?{exact:dev}:undefined,echoCancellation:$('#ec').checked,noiseSuppression:$('#ns').checked,autoGainControl:$('#ag').checked}})
+  }catch(e){return toast(e.name==='NotAllowedError'?'Microphone permission was blocked':'Could not open the microphone',1)}
+  loadDevices();const c=getCtx();await c.resume();
+  R.node=c.createMediaStreamSource(R.stream);R.an=c.createAnalyser();R.an.fftSize=1024;R.node.connect(R.an);
+  const mime=['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg;codecs=opus'].find(m=>MediaRecorder.isTypeSupported(m));
+  R.rec=new MediaRecorder(R.stream,mime?{mimeType:mime}:undefined);R.chunks=[];
+  R.rec.ondataavailable=e=>e.data.size&&R.chunks.push(e.data);R.rec.onstop=finishRec;
+  S.recAt=S.head;S.range=null;S.sel.clear();
+  R.rec.start(250);R.active=true;R.paused=false;R.acc=0;R.start=performance.now();recUI();ui()}
+const recElapsed=()=>R.active?(R.acc+(R.paused?0:(performance.now()-R.start)))/1000:0;
+function stopRec(){if(!R.active)return;R.active=false;if(R.rec.state!=='inactive')R.rec.stop();R.stream.getTracks().forEach(t=>t.stop());try{R.node.disconnect()}catch(e){}recUI();ui()}
+function pauseRec(){if(!R.active)return;if(R.paused){R.rec.resume();R.start=performance.now();R.paused=false}else{R.rec.pause();R.acc+=performance.now()-R.start;R.paused=true}recUI()}
+async function finishRec(){
+  try{const blob=new Blob(R.chunks,{type:R.rec.mimeType}),nb=await getCtx().decodeAudioData(await blob.arrayBuffer());
+    const n=(S.clips.filter(c=>c.src.name.startsWith('Take')).map(c=>c.src.name)).length;
+    const names=new Set(S.clips.map(c=>c.src.name));let k=1;while(names.has('Take '+k))k++;
+    insertSource(makeSrc(nb,'Take '+k),S.recAt);toast('Take added at '+fmt(S.recAt,1));
+  }catch(e){toast('Could not decode that recording',1)}}
+function recUI(){const on=R.active;$('#recBtn').classList.toggle('on',on&&!R.paused);$('#recTime').classList.toggle('live',on);
+  $('#stopRec').disabled=!on;$('#pauseRec').disabled=!on;setIcon($('#pauseRec'),R.paused?'play':'pause');setIcon($('#recBtn'),on?'stop':'mic')}
+$('#recBtn').onclick=()=>R.active?stopRec():startRec();
+$('#stopRec').onclick=stopRec;$('#pauseRec').onclick=pauseRec;
+$('#newBtn').onclick=async()=>{
+  if(R.active)return;
+  if(S.clips.length){
+    const ok=await confirmDlg('Start a new recording?','This removes everything on the timeline and starts recording from 0:00. You can still bring it back with Ctrl+Z.','Delete & record');
+    if(!ok)return;edit(a=>{a.length=0},'Timeline cleared')}
+  S.head=0;S.view=0;S.range=null;S.sel.clear();ui();startRec()};
+
+function drawScope(){
+  const d=devicePixelRatio||1,r=scope.getBoundingClientRect(),w=Math.round(r.width*d),h=Math.round(r.height*d);
+  if(scope.width!==w||scope.height!==h){scope.width=w;scope.height=h}
+  const W=scope.width,H=scope.height;sg.clearRect(0,0,W,H);sg.lineWidth=2*d;sg.lineCap='round';
+  const grd=sg.createLinearGradient(0,0,W,0);grd.addColorStop(0,'#7c5cff');grd.addColorStop(.5,'#ff4fa3');grd.addColorStop(1,'#ffb547');sg.strokeStyle=grd;sg.beginPath();
+  if(R.active&&!R.paused&&R.an){const data=new Uint8Array(R.an.fftSize);R.an.getByteTimeDomainData(data);let pk=0;
+    for(let i=0;i<data.length;i++){const v=(data[i]-128)/128;pk=Math.max(pk,Math.abs(v));const x=i/(data.length-1)*W,y=H/2+v*H*.46;i?sg.lineTo(x,y):sg.moveTo(x,y)}
+    $('#lvl').style.width=Math.min(100,pk*140)+'%'}
+  else{sg.moveTo(0,H/2);sg.lineTo(W,H/2);sg.globalAlpha=.35;$('#lvl').style.width='0'}
+  sg.stroke();sg.globalAlpha=1;$('#recTime').textContent=fmt(recElapsed(),1)}
+
+/* ---------- import / export ---------- */
+async function loadFile(f){
+  if(!f||R.active)return;toast('Loading '+f.name+'…');
+  try{const nb=await getCtx().decodeAudioData(await f.arrayBuffer());
+    const at=S.head;insertSource(makeSrc(nb,f.name.replace(/\.[^.]+$/,'')),at);toast('Added '+f.name+' at '+fmt(at,1))}
+  catch(e){toast('That file could not be decoded as audio',1)}}
+$('#importBtn').onclick=()=>$('#file').click();$('#file').onchange=e=>{loadFile(e.target.files[0]);e.target.value=''};
+const wrap=$('#tlWrap');
+addEventListener('dragover',e=>{e.preventDefault();wrap.classList.add('drop')});
+addEventListener('dragleave',e=>{if(!e.relatedTarget)wrap.classList.remove('drop')});
+addEventListener('drop',e=>{e.preventDefault();wrap.classList.remove('drop');loadFile(e.dataTransfer.files[0])});
+
+function renderMix(){
+  const end=contentEnd(),sr=getCtx().sampleRate,n=Math.max(1,Math.round(end*sr));
+  const ch=Math.min(2,Math.max(...S.clips.map(c=>c.src.buf.numberOfChannels)));
+  const out=[];for(let c=0;c<ch;c++)out.push(new Float32Array(n));
+  S.clips.forEach((cl,i)=>{
+    const s0=Math.round(cl.t*sr),a0=Math.round(cl.a*sr),m=Math.round(len(cl)*sr),f=Math.min(Math.round(.004*sr),m>>1);
+    const p=S.clips[i-1],nx=S.clips[i+1],cp=p&&contig(p,cl),cn=nx&&contig(cl,nx),buf=cl.src.buf;
+    for(let c=0;c<ch;c++){const d=buf.getChannelData(Math.min(c,buf.numberOfChannels-1)),o=out[c];
+      for(let k=0;k<m;k++){const idx=s0+k;if(idx>=n)break;let v=d[a0+k]||0;if(!cp&&k<f)v*=k/f;if(!cn&&k>=m-f)v*=(m-1-k)/f;o[idx]+=v}}});
+  return {out,sr,n}}
+function encodeWAV(chs,sr,s,e){
+  const ch=chs.length,n=e-s,bytes=n*ch*2,ab=new ArrayBuffer(44+bytes),v=new DataView(ab);
+  const w=(o,t)=>{for(let i=0;i<t.length;i++)v.setUint8(o+i,t.charCodeAt(i))};
+  w(0,'RIFF');v.setUint32(4,36+bytes,true);w(8,'WAVEfmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,ch,true);
+  v.setUint32(24,sr,true);v.setUint32(28,sr*ch*2,true);v.setUint16(32,ch*2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,bytes,true);
+  let p=44;for(let i=s;i<e;i++)for(let c=0;c<ch;c++){const x=clamp(chs[c][i],-1,1);v.setInt16(p,x<0?x*32768:x*32767,true);p+=2}
+  return new Blob([ab],{type:'audio/wav'})}
+$('#exportBtn').onclick=()=>{
+  if(!S.clips.length)return;const {out,sr,n}=renderMix();
+  let s=0,e=n;if(S.range){s=clamp(Math.round(S.range.a*sr),0,n);e=clamp(Math.round(S.range.b*sr),s+1,n)}
+  const url=URL.createObjectURL(encodeWAV(out,sr,s,e)),a=document.createElement('a');
+  a.href=url;a.download='amusing-recording'+(S.range?'-selection':'')+'.wav';a.click();setTimeout(()=>URL.revokeObjectURL(url),4000);
+  toast(S.range?'Exported the selected range':'Exported WAV')};
+
+/* ---------- keyboard ---------- */
+addEventListener('keydown',e=>{
+  if($('#dlg').open)return;
+  const tg=e.target;if(tg.tagName==='SELECT')return;
+  const k=e.key.toLowerCase(),mod=e.ctrlKey||e.metaKey;
+  if(k===' '){e.preventDefault();S.playing?pausePlayback():play();return}
+  if(mod&&k==='z'){e.preventDefault();e.shiftKey?redo():undo();return}
+  if(mod&&k==='y'){e.preventDefault();redo();return}
+  if(mod&&k==='a'){e.preventDefault();if(S.clips.length){S.sel=new Set(S.clips.map(c=>c.id));S.range=null;ui()}return}
+  if(mod)return;
+  if(k==='c'){setTool('cut')}
+  else if(k==='s'||k==='v'){setTool('select')}
+  else if(k==='k'){if(S.clips.length)opSplit(S.head)}
+  else if(k==='r'){R.active?stopRec():startRec()}
+  else if(k==='delete'||k==='backspace'){e.preventDefault();deleteSelection()}
+  else if(k==='escape'){S.sel.clear();S.range=null;ui()}
+  else if(k==='arrowleft'){e.preventDefault();setHead(S.head-(e.shiftKey?1:.1))}
+  else if(k==='arrowright'){e.preventDefault();setHead(S.head+(e.shiftKey?1:.1))}
+  else if(k==='home'){setHead(0)}
+  else if(k==='end'){setHead(contentEnd())}
+  else if(k==='='||k==='+'){zoomAt(1.5)}
+  else if(k==='-'){zoomAt(1/1.5)}});
+addEventListener('click',e=>{const b=e.target.closest('button');if(b)b.blur()});
+addEventListener('beforeunload',e=>{if(S.clips.length){e.preventDefault();e.returnValue=''}});
+
+/* ---------- main loop ---------- */
+function follow(){const vis=cv.clientWidth/S.pps;if(S.head>S.view+vis*.92)S.view=S.head-vis*.15;else if(S.head<S.view)S.view=S.head;syncScroll()}
+function frame(){
+  if(S.playing){S.head=S.off+Math.max(0,getCtx().currentTime-S.t0);
+    if(S.head>=contentEnd()){stopSrcs();S.playing=false;S.head=contentEnd();ui()}else follow()}
+  if(R.active&&!R.paused){S.head=S.recAt+recElapsed();follow()}
+  $('#clock').textContent=fmt(S.head);
+  draw();drawScope();requestAnimationFrame(frame)}
+ui();recUI();requestAnimationFrame(frame);
+window.__studio={S,insertSource,makeSrc,opSplit,opDeleteRange,opDeleteClips,undo,redo,renderMix,contentEnd};
+</script>
+</body>
+</html>
