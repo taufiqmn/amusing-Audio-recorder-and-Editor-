@@ -7,6 +7,7 @@ The home page (`public/index.html`) is a **timeline editor**: audio lives on a t
 - **R** records at the playhead. New audio is inserted there; nothing is overwritten.
 - **Fill gaps** on: deleting closes the gap and a new take pushes the rest right. Off: deleted parts stay empty, and a take fills the gap (later audio moves only if the take is longer).
 - **New recording…** asks first, then clears the timeline (Ctrl+Z brings it back).
+- **Shortcuts are customizable**: click *Shortcuts* in the header, pick an action, press the new keys. Saved in the browser; works on any keyboard layout (keys are matched by physical position).
 - **Enhance** (AI noise removal, presets, loudness) with an original/enhanced switch (**B**), and **Export** to WAV, FLAC, MP3 or Opus.
 
 The original single-waveform editor is still available at `/classic` (`public/classic.html`). Both share the code in `public/js/`.

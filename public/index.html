@@ -122,6 +122,27 @@ kbd{padding:2px 6px;border-radius:6px;background:var(--panel-2);border:1px solid
 .ab button{padding:7px 14px;border-radius:9px;font-size:.84rem;font-weight:600;color:var(--muted)}
 .ab button.active{background:var(--grad);color:#fff}
 [hidden]{display:none!important}
+.klist{display:grid;gap:8px}
+.krow{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:.84rem;color:var(--muted)}
+.krow .kk{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.keyhead{display:flex;align-items:center;justify-content:space-between;margin-top:14px}
+dialog.wide{width:min(560px,94vw);max-height:88vh;overflow:auto}
+dialog.wide .dtop{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+dialog.wide .dtop h3{margin:0}
+dialog.wide p{margin-bottom:14px}
+.kedit{display:grid;gap:6px}
+.kitem{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;border:1px solid transparent}
+.kitem:hover{background:var(--panel)}
+.kitem .nm{flex:1;font-size:.9rem}
+.kitem .kc{min-width:92px;padding:7px 12px;border-radius:10px;background:var(--panel-2);border:1px solid var(--line);font-weight:600;font-size:.82rem;display:flex;gap:6px;justify-content:center;flex-wrap:wrap;transition:.15s}
+.kitem .kc:hover{border-color:rgba(255,255,255,.3)}
+.kitem.cap .kc{background:var(--grad);border-color:transparent;color:#fff;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.7}}
+.kitem .rs{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;color:var(--muted);visibility:hidden}
+.kitem .rs:hover{background:var(--panel-2);color:var(--text)}
+.kitem.mod .rs{visibility:visible}
+.kitem .none{color:var(--muted);font-weight:500}
+.dfoot{display:flex;justify-content:space-between;gap:10px;margin-top:18px}
 a.lnk{color:var(--muted)}a.lnk:hover{color:var(--text)}
 dialog{margin:auto;background:#161626;color:var(--text);border:1px solid var(--line);border-radius:20px;padding:26px;width:min(420px,92vw);box-shadow:0 30px 80px rgba(0,0,0,.6)}
 dialog::backdrop{background:rgba(5,5,12,.62);backdrop-filter:blur(4px)}
@@ -142,6 +163,7 @@ footer{text-align:center;color:var(--muted);font-size:.78rem;padding:0 16px 30px
     <div>Amusing Audio Studio<small>Record · Cut · Re-record — private, in your browser</small></div>
   </div>
   <div class="hdr-actions">
+    <button class="btn" id="keysBtn" title="Keyboard shortcuts"><i data-i="keyboard"></i><span>Shortcuts</span></button>
     <button class="btn" id="importBtn"><i data-i="upload"></i><span>Import</span></button>
     <button class="btn primary" id="exportBtn" disabled><i data-i="download"></i><span>Export</span></button>
     <input type="file" id="file" accept="audio/*,video/*" hidden>
@@ -175,15 +197,8 @@ footer{text-align:center;color:var(--muted);font-size:.78rem;padding:0 16px 30px
     </section>
     <section class="card">
       <h2>Shortcuts</h2>
-      <div class="keys" style="grid-template-columns:1fr">
-        <div><kbd>C</kbd> cutter tool — click to cut</div>
-        <div><kbd>S</kbd> select tool</div>
-        <div><kbd>K</kbd> cut at the playhead</div>
-        <div><kbd>Del</kbd> delete selection</div>
-        <div><kbd>Ctrl</kbd>+<kbd>Z</kbd> undo · <kbd>Ctrl</kbd>+<kbd>Y</kbd> redo</div>
-        <div><kbd>Space</kbd> play / pause · <kbd>R</kbd> record</div>
-        <div><kbd>Ctrl</kbd>+<kbd>A</kbd> select all · <kbd>Esc</kbd> deselect</div>
-        <div><kbd>←</kbd> <kbd>→</kbd> nudge playhead · <kbd>Ctrl</kbd>+scroll zoom</div>
+      <div class="klist" id="keyList"></div>
+      <div class="keyhead"><span class="sub" style="margin:0">Saved in this browser.</span><button class="btn" id="keysBtn2"><i data-i="keyboard"></i>Customize</button></div>
       </div>
     </section>
   </div>
@@ -194,8 +209,8 @@ footer{text-align:center;color:var(--muted);font-size:.78rem;padding:0 16px 30px
       <div class="toolbar">
         <div class="tb-group">
           <div class="seg" role="toolbar" aria-label="Tools">
-            <button id="toolSel" class="active" title="Select (S)"><i data-i="cursor"></i>Select <kbd>S</kbd></button>
-            <button id="toolCut" title="Cutter (C)"><i data-i="scissors"></i>Cut <kbd>C</kbd></button>
+            <button id="toolSel" class="active" title="Select (S)"><i data-i="cursor"></i>Select <kbd data-k="toolSel">S</kbd></button>
+            <button id="toolCut" title="Cutter (C)"><i data-i="scissors"></i>Cut <kbd data-k="toolCut">C</kbd></button>
             <button id="btnSplit" title="Cut at playhead (K)" disabled><i data-i="split"></i>Split</button>
             <button id="btnDel" title="Delete selection (Del)" disabled><i data-i="trash"></i>Delete</button>
           </div>
@@ -246,7 +261,7 @@ footer{text-align:center;color:var(--muted);font-size:.78rem;padding:0 16px 30px
         <button class="btn" id="enhApply" hidden><i data-i="check"></i>Apply to timeline</button>
       </div>
       <div class="bar" id="enhBar" hidden><i></i></div>
-      <div class="note" id="enhNote">Records or imports first, then preview. Press <kbd>B</kbd> to switch between original and enhanced while playing.</div>
+      <div class="note" id="enhNote">Records or imports first, then preview. Press <kbd data-k="ab">B</kbd> to switch between original and enhanced while playing.</div>
     </section>
 
     <section class="card" id="expCard">
@@ -275,6 +290,13 @@ footer{text-align:center;color:var(--muted);font-size:.78rem;padding:0 16px 30px
 <footer>Everything runs locally in your browser — your audio is never uploaded. Closing the tab discards the project, so export first. Made for Amusing Study Hall · <a class="lnk" href="classic.html">Classic Takeflow editor</a></footer>
 <div class="toast" id="toast"></div>
 
+<dialog id="keyDlg" class="wide">
+  <div class="dtop"><h3>Keyboard shortcuts</h3><button class="btn icon" id="keyClose" title="Close"><i data-i="x"></i></button></div>
+  <p>Click a shortcut, then press the keys you want (for example <kbd>X</kbd> or <kbd>Ctrl</kbd>+<kbd>K</kbd>). <kbd>Esc</kbd> cancels. If a key is already used, it moves to the new action.</p>
+  <div class="kedit" id="keyEdit"></div>
+  <div class="dfoot"><button class="btn" id="keyResetAll">Reset all to default</button><button class="btn primary" id="keyDone">Done</button></div>
+</dialog>
+
 <dialog id="dlg">
   <form method="dialog">
     <h3 id="dlgT"></h3><p id="dlgP"></p>
@@ -300,7 +322,7 @@ const ICONS = {
   trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
   zin:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5M11 8v6M8 11h6"/>', zout:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5M8 11h6"/>',
   fit:'<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
-  cursor:'<path d="M5 3l14 7-6 2-2 6z"/>', check:'<path d="M5 12l5 5 9-10"/>', wand:'<path d="M15 4V2M15 16v-2M8 9h2M20 9h2M17.8 11.8L19 13M17.8 6.2L19 5M3 21l9-9M12.2 6.2L11 5"/>', split:'<path d="M12 3v18M7 8l-4 4 4 4M17 8l4 4-4 4"/>'
+  cursor:'<path d="M5 3l14 7-6 2-2 6z"/>', check:'<path d="M5 12l5 5 9-10"/>', keyboard:'<rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/>', x:'<path d="M6 6l12 12M18 6L6 18"/>', wand:'<path d="M15 4V2M15 16v-2M8 9h2M20 9h2M17.8 11.8L19 13M17.8 6.2L19 5M3 21l9-9M12.2 6.2L11 5"/>', split:'<path d="M12 3v18M7 8l-4 4 4 4M17 8l4 4-4 4"/>'
 };
 const FILLED = k => k==='play'||k==='pause'||k==='stop';
 document.querySelectorAll('i[data-i]').forEach(el=>{
@@ -385,11 +407,12 @@ function insertSource(src,at){
 function fmt(t,d=2){t=Math.max(0,t);const m=Math.floor(t/60);const s=(t-m*60).toFixed(d).padStart(d?3+d:2,'0');return m+':'+s}
 function toast(msg,err){const t=$('#toast');t.textContent=msg;t.className='toast show'+(err?' err':'');clearTimeout(toast.t);toast.t=setTimeout(()=>t.className='toast',2800)}
 
+const PAL=[[[124,92,255],[255,79,163]],[[45,212,191],[59,130,246]],[[255,181,71],[255,79,110]],[[132,204,22],[16,185,129]],[[56,189,248],[168,85,247]]];let palN=0;
 function makeSrc(buf,name){
   const PK=256,n=Math.ceil(buf.length/PK),p=new Float32Array(n);
   for(let c=0;c<buf.numberOfChannels;c++){const d=buf.getChannelData(c);
     for(let i=0;i<n;i++){let m=p[i];const e=Math.min(buf.length,(i+1)*PK);for(let j=i*PK;j<e;j++){const v=Math.abs(d[j]);if(v>m)m=v}p[i]=m}}
-  return {buf,name,peaks:p,PK}}
+  return {buf,name,peaks:p,PK,pal:PAL[(palN++)%PAL.length]}}
 
 async function confirmDlg(title,text,ok){
   const d=$('#dlg');if(!d.showModal)return window.confirm(title+'\n\n'+text);
@@ -455,7 +478,7 @@ function draw(){
     const sel=S.sel.has(c.id);
     g.save();rr(x1,y,x2-x1,h,10);
     const gr=g.createLinearGradient(0,y,0,y+h);
-    gr.addColorStop(0,sel?'rgba(150,120,255,.6)':'rgba(124,92,255,.4)');gr.addColorStop(1,sel?'rgba(255,79,163,.5)':'rgba(255,79,163,.25)');
+    const [p0,p1]=c.src.pal||PAL[0];gr.addColorStop(0,'rgba('+p0+','+(sel?.62:.4)+')');gr.addColorStop(1,'rgba('+p1+','+(sel?.5:.25)+')');
     g.fillStyle=gr;g.fill();g.clip();
     const mid=y+h/2+8,amp=(h-30)/2,pk=c.src.peaks,PK=c.src.PK,sr=c.src.buf.sampleRate;
     g.fillStyle=sel?'#ffffff':'rgba(255,255,255,.82)';
@@ -485,7 +508,7 @@ function draw(){
 
   // playhead
   const px=t2x(S.head);
-  if(px>=-8&&px<=W+8){g.fillStyle='#ffb547';g.fillRect(px-1,0,2,H);g.beginPath();g.moveTo(px-7,0);g.lineTo(px+7,0);g.lineTo(px,11);g.closePath();g.fill()}
+  if(px>=-8&&px<=W+8){g.save();g.shadowColor='rgba(255,181,71,.9)';g.shadowBlur=10;g.fillStyle='#ffb547';g.fillRect(px-1,0,2,H);g.restore();g.fillStyle='#ffb547';g.beginPath();g.moveTo(px-7,0);g.lineTo(px+7,0);g.lineTo(px,11);g.closePath();g.fill()}
 }
 
 /* ---------- timeline mouse ---------- */
@@ -681,8 +704,8 @@ $('#enhBtn').onclick=()=>{
     const buf=getCtx().createBuffer(1,d.audio.length,sr);buf.getChannelData(0).set(d.audio);
     S.preview={audio:d.audio,buf,sr,report:d.report};S.ab=true;
     $('#abBox').hidden=false;$('#enhApply').hidden=false;$('#useEnhRow').hidden=false;setAB(true);
-    const r=d.report;$('#enhNote').innerHTML=r&&isFinite(r.inputLufs)?'<b>Preview ready.</b> Loudness '+r.inputLufs.toFixed(1)+' → '+r.outputLufs.toFixed(1)+' LUFS, peaks at '+r.peakDb.toFixed(1)+' dBFS. Play it, press <kbd>B</kbd> to compare.':'<b>Preview ready.</b> Press play, and <kbd>B</kbd> to compare.';
-    updateExportUI()};
+    const r=d.report;$('#enhNote').innerHTML=r&&isFinite(r.inputLufs)?'<b>Preview ready.</b> Loudness '+r.inputLufs.toFixed(1)+' → '+r.outputLufs.toFixed(1)+' LUFS, peaks at '+r.peakDb.toFixed(1)+' dBFS. Play it, press <kbd data-k="ab">B</kbd> to compare.':'<b>Preview ready.</b> Press play, and <kbd data-k="ab">B</kbd> to compare.';
+    refreshKeyUI();updateExportUI()};
   w.onerror=ev=>{enhJob=null;$('#enhBar').hidden=true;$('#enhCancel').hidden=true;$('#enhBtn').disabled=!S.clips.length;$('#enhNote').textContent='The enhancer stopped unexpectedly: '+(ev.message||'unknown error')};
   w.postMessage({id,audio:m,sampleRate:sr,params},[m.buffer])};
 $('#enhCancel').onclick=()=>{if(enhW){enhW.terminate();enhW=null}enhJob=null;$('#enhBar').hidden=true;$('#enhCancel').hidden=true;$('#enhBtn').disabled=!S.clips.length;$('#enhNote').textContent='Cancelled.'};
@@ -736,29 +759,98 @@ async function doExport(){
   window.__lastExport={name,size,type:res.blob.type,blob:res.blob,rate:res.rate}}
 
 
-/* ---------- keyboard ---------- */
+/* ---------- keyboard shortcuts (customizable, saved in this browser) ---------- */
+const ACTIONS=[
+ {id:'play',label:'Play / pause',def:['Space'],run:()=>S.playing?pausePlayback():play()},
+ {id:'record',label:'Record / stop recording',def:['R'],run:()=>R.active?stopRec():startRec()},
+ {id:'toolCut',label:'Cutter tool (click to cut)',def:['C'],run:()=>setTool('cut')},
+ {id:'toolSel',label:'Select tool',def:['S','V'],run:()=>setTool('select')},
+ {id:'split',label:'Cut at the playhead',def:['K'],run:()=>{if(S.clips.length)opSplit(S.head)}},
+ {id:'del',label:'Delete selection',def:['Delete','Backspace'],run:()=>deleteSelection()},
+ {id:'undo',label:'Undo',def:['Ctrl+Z'],run:()=>undo()},
+ {id:'redo',label:'Redo',def:['Ctrl+Y','Ctrl+Shift+Z'],run:()=>redo()},
+ {id:'selAll',label:'Select all clips',def:['Ctrl+A'],run:()=>{if(S.clips.length){S.sel=new Set(S.clips.map(c=>c.id));S.range=null;ui()}}},
+ {id:'deselect',label:'Deselect',def:['Escape'],run:()=>{S.sel.clear();S.range=null;ui()}},
+ {id:'left',label:'Playhead back 0.1 s',def:['Left'],run:()=>setHead(S.head-.1)},
+ {id:'right',label:'Playhead forward 0.1 s',def:['Right'],run:()=>setHead(S.head+.1)},
+ {id:'leftBig',label:'Playhead back 1 s',def:['Shift+Left'],run:()=>setHead(S.head-1)},
+ {id:'rightBig',label:'Playhead forward 1 s',def:['Shift+Right'],run:()=>setHead(S.head+1)},
+ {id:'home',label:'Jump to start',def:['Home'],run:()=>setHead(0)},
+ {id:'end',label:'Jump to end',def:['End'],run:()=>setHead(contentEnd())},
+ {id:'zoomIn',label:'Zoom in',def:['=','+'],run:()=>zoomAt(1.5)},
+ {id:'zoomOut',label:'Zoom out',def:['-'],run:()=>zoomAt(1/1.5)},
+ {id:'fill',label:'Toggle Fill gaps',def:['F'],run:()=>$('#ripple').click()},
+ {id:'snap',label:'Toggle Snap',def:['G'],run:()=>$('#snap').click()},
+ {id:'ab',label:'Original / enhanced (A/B)',def:['B'],run:()=>{if(S.preview)setAB(!S.ab)}},
+ {id:'export',label:'Export',def:['Ctrl+E'],run:()=>doExport()}
+];
+const KEYS_STORE='amusing.shortcuts.v1';
+let custom={};
+try{const j=JSON.parse(localStorage.getItem(KEYS_STORE)||'{}');if(j&&typeof j==='object')for(const a of ACTIONS)if(Array.isArray(j[a.id])&&j[a.id].every(x=>typeof x==='string'))custom[a.id]=j[a.id]}catch(e){}
+const bindings=a=>custom[a.id]||a.def;
+function saveKeys(){try{localStorage.setItem(KEYS_STORE,JSON.stringify(custom))}catch(e){}}
+const CODE_NAMES={Space:'Space',ArrowLeft:'Left',ArrowRight:'Right',ArrowUp:'Up',ArrowDown:'Down',Equal:'=',Minus:'-',NumpadAdd:'+',NumpadSubtract:'-',Comma:',',Period:'.',Slash:'/',Backslash:'\\',BracketLeft:'[',BracketRight:']',Semicolon:';',Quote:"'",Backquote:'`',Enter:'Enter',NumpadEnter:'Enter',Tab:'Tab',Escape:'Escape',Delete:'Delete',Backspace:'Backspace',Home:'Home',End:'End',PageUp:'PageUp',PageDown:'PageDown',Insert:'Insert'};
+function keyName(e){const c=e.code||'';
+  if(/^Key[A-Z]$/.test(c))return c.slice(3);if(/^Digit\d$/.test(c))return c.slice(5);if(/^Numpad\d$/.test(c))return 'Num'+c.slice(6);
+  if(/^F\d{1,2}$/.test(c))return c;if(CODE_NAMES[c])return CODE_NAMES[c];return null}
+function comboOf(e){const k=keyName(e);if(!k)return null;
+  const punct=k.length===1&&!/[A-Z0-9]/.test(k);   // Shift only counts for letters, digits and named keys
+  return (e.ctrlKey||e.metaKey?'Ctrl+':'')+(e.altKey?'Alt+':'')+(e.shiftKey&&!punct?'Shift+':'')+k}
+const PRETTY={Left:'←',Right:'→',Up:'↑',Down:'↓',Escape:'Esc',Delete:'Del',Backspace:'⌫'};
+const pretty=c=>c.split('+').map(x=>PRETTY[x]||x).join('+');
+let keyMap=new Map();
+function rebuildKeyMap(){keyMap=new Map();for(const a of ACTIONS)for(const c of bindings(a))if(!keyMap.has(c))keyMap.set(c,a)}
+const firstKey=id=>{const a=ACTIONS.find(x=>x.id===id);const b=a&&bindings(a);return b&&b.length?pretty(b[0]):''};
+function refreshKeyUI(){
+  rebuildKeyMap();
+  document.querySelectorAll('[data-k]').forEach(el=>{const k=firstKey(el.dataset.k);el.textContent=k;el.style.display=k?'':'none'});
+  const tip=(sel,id,label)=>{const el=$(sel);if(el){const k=firstKey(id);el.title=label+(k?' ('+k+')':'')}};
+  tip('#playBtn','play','Play / pause');tip('#recBtn','record','Record at the playhead');tip('#toolSel','toolSel','Select');tip('#toolCut','toolCut','Cutter');
+  tip('#btnSplit','split','Cut at playhead');tip('#btnDel','del','Delete selection');tip('#undoBtn','undo','Undo');tip('#redoBtn','redo','Redo');
+  tip('#zoomIn','zoomIn','Zoom in');tip('#zoomOut','zoomOut','Zoom out');
+  const L=$('#keyList');L.innerHTML='';
+  for(const id of ['play','record','toolCut','toolSel','split','del','undo','redo','selAll','fill']){
+    const a=ACTIONS.find(x=>x.id===id),row=document.createElement('div');row.className='krow';
+    const nm=document.createElement('span');nm.textContent=a.label.replace(/ \(click to cut\)/,'');
+    const kk=document.createElement('span');kk.className='kk';
+    const b=bindings(a);if(!b.length){kk.textContent='—'}else for(const c of b.slice(0,2)){const k=document.createElement('kbd');k.textContent=pretty(c);kk.appendChild(k)}
+    row.append(nm,kk);L.appendChild(row)}
+  if($('#keyDlg').open)renderKeyEditor()}
+
 addEventListener('keydown',e=>{
-  if($('#dlg').open)return;
-  const tg=e.target;if(tg.tagName==='SELECT')return;
-  const k=e.key.toLowerCase(),mod=e.ctrlKey||e.metaKey;
-  if(k===' '){e.preventDefault();S.playing?pausePlayback():play();return}
-  if(mod&&k==='z'){e.preventDefault();e.shiftKey?redo():undo();return}
-  if(mod&&k==='y'){e.preventDefault();redo();return}
-  if(mod&&k==='a'){e.preventDefault();if(S.clips.length){S.sel=new Set(S.clips.map(c=>c.id));S.range=null;ui()}return}
-  if(mod)return;
-  if(k==='c'){setTool('cut')}
-  else if(k==='s'||k==='v'){setTool('select')}
-  else if(k==='k'){if(S.clips.length)opSplit(S.head)}
-  else if(k==='b'){if(S.preview)setAB(!S.ab)}
-  else if(k==='r'){R.active?stopRec():startRec()}
-  else if(k==='delete'||k==='backspace'){e.preventDefault();deleteSelection()}
-  else if(k==='escape'){S.sel.clear();S.range=null;ui()}
-  else if(k==='arrowleft'){e.preventDefault();setHead(S.head-(e.shiftKey?1:.1))}
-  else if(k==='arrowright'){e.preventDefault();setHead(S.head+(e.shiftKey?1:.1))}
-  else if(k==='home'){setHead(0)}
-  else if(k==='end'){setHead(contentEnd())}
-  else if(k==='='||k==='+'){zoomAt(1.5)}
-  else if(k==='-'){zoomAt(1/1.5)}});
+  if(document.querySelector('dialog[open]'))return;
+  const tg=e.target;if(tg.tagName==='SELECT'||tg.tagName==='TEXTAREA'||(tg.tagName==='INPUT'&&tg.type==='text'))return;
+  const c=comboOf(e);if(!c)return;const a=keyMap.get(c);if(!a)return;
+  e.preventDefault();if(e.repeat&&!/^(left|right|leftBig|rightBig|zoomIn|zoomOut)$/.test(a.id))return;a.run()});
+
+/* editor dialog */
+let capId=null;
+function renderKeyEditor(){
+  const box=$('#keyEdit');box.innerHTML='';
+  for(const a of ACTIONS){
+    const mod=!!custom[a.id],row=document.createElement('div');row.className='kitem'+(mod?' mod':'')+(capId===a.id?' cap':'');
+    const nm=document.createElement('span');nm.className='nm';nm.textContent=a.label;
+    const kc=document.createElement('button');kc.className='kc';kc.title='Click, then press a new key';
+    if(capId===a.id)kc.textContent='Press keys…';else{const b=bindings(a);if(!b.length){const n=document.createElement('span');n.className='none';n.textContent='Not set';kc.appendChild(n)}else for(const c of b){const k=document.createElement('kbd');k.textContent=pretty(c);kc.appendChild(k)}}
+    kc.onclick=()=>{capId=a.id;renderKeyEditor()};
+    const rs=document.createElement('button');rs.className='rs';rs.title='Reset to default';rs.innerHTML='<svg class="i" viewBox="0 0 24 24">'+ICONS.undo+'</svg>';
+    rs.onclick=()=>{delete custom[a.id];saveKeys();capId=null;refreshKeyUI();renderKeyEditor()};
+    row.append(nm,kc,rs);box.appendChild(row)}}
+addEventListener('keydown',e=>{
+  if(!capId||!$('#keyDlg').open)return;
+  e.preventDefault();e.stopImmediatePropagation();
+  if(e.key==='Escape'){capId=null;renderKeyEditor();return}
+  const c=comboOf(e);if(!c)return;                      // a bare modifier: keep waiting
+  const a=ACTIONS.find(x=>x.id===capId);let moved=null;
+  for(const o of ACTIONS){if(o===a)continue;const b=bindings(o);if(b.includes(c)){custom[o.id]=b.filter(x=>x!==c);moved=o}}
+  custom[a.id]=[c];capId=null;saveKeys();refreshKeyUI();renderKeyEditor();
+  toast(moved?pretty(c)+' now '+a.label.toLowerCase()+' (was '+moved.label.toLowerCase()+')':a.label+': '+pretty(c))},true);
+function openKeys(){capId=null;renderKeyEditor();$('#keyDlg').showModal()}
+$('#keysBtn').onclick=openKeys;$('#keysBtn2').onclick=openKeys;
+$('#keyClose').onclick=$('#keyDone').onclick=()=>$('#keyDlg').close();
+$('#keyDlg').addEventListener('close',()=>{capId=null});
+$('#keyResetAll').onclick=()=>{custom={};saveKeys();capId=null;refreshKeyUI();renderKeyEditor();toast('Shortcuts reset to default')};
+refreshKeyUI();
 addEventListener('click',e=>{const b=e.target.closest('button');if(b)b.blur()});
 addEventListener('beforeunload',e=>{if(S.clips.length){e.preventDefault();e.returnValue=''}});
 
@@ -772,7 +864,7 @@ function frame(){
   draw();drawScope();requestAnimationFrame(frame)}
 ui();recUI();requestAnimationFrame(frame);
 if('serviceWorker' in navigator&&window.isSecureContext&&!location.hostname.match(/^(localhost|127\.)/))navigator.serviceWorker.register('sw.js').catch(()=>{});
-window.__studio={S,dropPreview,insertSource,makeSrc,opSplit,opDeleteRange,opDeleteClips,undo,redo,renderMix,contentEnd};
+window.__studio={S,custom:()=>custom,dropPreview,insertSource,makeSrc,opSplit,opDeleteRange,opDeleteClips,undo,redo,renderMix,contentEnd};
 </script>
 </body>
 </html>
