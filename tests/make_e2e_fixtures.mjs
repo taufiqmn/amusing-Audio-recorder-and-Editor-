@@ -1,0 +1,23 @@
+// Writes the media used by the browser test into the folder given as argv[2].
+import fs from 'node:fs'; import path from 'node:path'; import { execFileSync } from 'node:child_process';
+import * as F from './fixtures.mjs';
+const dir = process.argv[2] || '/tmp/studio-fx'; fs.mkdirSync(dir, { recursive: true }); fs.mkdirSync(path.join(dir, 'folder', 'inner'), { recursive: true });
+const put = (n, b) => fs.writeFileSync(path.join(dir, n), b);
+const voice = (fs_, sec, seed, noise = 'fan', snr = 10) => { const { x, mask } = F.cleanSpeech(fs_, sec, seed); const nz = noise === 'fan' ? F.fan(x.length, fs_) : noise === 'hiss' ? F.white(x.length, seed) : F.hum(x.length, fs_, 50); return F.addNoise(x, mask, nz, snr); };
+put('lesson 01.wav', F.wav([voice(48000, 10, 1)], 48000));
+put('lesson 02 44k.wav', F.wav([voice(44100, 10, 2, 'hiss')], 44100));
+put('ক্লাস ৩ 🎙.wav', F.wav([voice(22050, 8, 3, 'hum')], 22050));
+const st = voice(48000, 8, 4); put('stereo interview.wav', F.wav([st, F.gainDb(st, -2)], 48000));
+put('echo room.wav', F.wav([F.reverb(F.cleanSpeech(48000, 10, 5).x, 48000, 0.8, 0.8)], 48000));
+put('duplicate.wav', F.wav([voice(48000, 6, 6)], 48000)); put('folder/duplicate.wav', F.wav([voice(48000, 6, 7)], 48000));
+put('folder/inner/deep.wav', F.wav([voice(48000, 5, 8)], 48000)); put('folder/notes.txt', Buffer.from('not audio'));
+put('long 60s.wav', F.wav([voice(48000, 60, 9)], 48000));
+const tmpw = path.join(dir, '_src.wav'); fs.writeFileSync(tmpw, F.wav([voice(48000, 9, 10)], 48000));
+execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', tmpw, '-c:a', 'libmp3lame', '-b:a', '128k', path.join(dir, 'podcast.mp3')]);
+execFileSync('ffmpeg', ['-v', 'error', '-y', '-f', 'lavfi', '-i', 'color=c=purple:s=320x240:d=9', '-i', tmpw, '-shortest', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-c:a', 'aac', path.join(dir, 'client video.mp4')]);
+execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', tmpw, '-c:a', 'libopus', path.join(dir, 'call.webm')]);
+fs.unlinkSync(tmpw);
+put('broken.mp3', Buffer.from(Array.from({ length: 30000 }, (_, i) => (i * 7919) % 251)));
+put('empty.wav', Buffer.alloc(0));
+const { x } = F.cleanSpeech(48000, 4, 11); fs.writeFileSync('/tmp/studio-mic.wav', F.wav([F.addNoise(x, new Uint8Array(x.length).fill(1), F.white(x.length, 3), 30)], 48000));
+console.log('fixtures in', dir, fs.readdirSync(dir).join(', '));

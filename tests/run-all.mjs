@@ -1,9 +1,9 @@
 // Runs every Node test. Requires ffmpeg on PATH for the encoder and loudness checks.
 import { execFileSync } from 'node:child_process';
-const files = ['dsp.test.mjs', 'enhance.test.mjs', 'encoders.test.mjs', 'engine.test.mjs'];
+const files = ['dsp.test.mjs', 'enhance.test.mjs', 'encoders.test.mjs', 'engine.test.mjs', 'studio-io.test.mjs', 'studio-engine.test.mjs'];
 let failed = 0;
 for (const f of files) {
-  const out = execFileSync(process.execPath, [new URL(f, import.meta.url).pathname], { encoding: 'utf8' });
+  const out = execFileSync(process.execPath, [new URL(f, import.meta.url).pathname], { encoding: 'utf8', maxBuffer: 1 << 26 });
   process.stdout.write(out);
   failed += (out.match(/✗/g) || []).length;
 }

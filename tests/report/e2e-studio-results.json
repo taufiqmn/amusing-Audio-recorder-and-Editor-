@@ -1,0 +1,268 @@
+[
+ {
+  "id": "UI",
+  "name": "first screen interactive",
+  "pass": true,
+  "measured": "0.23 s on localhost",
+  "threshold": "loads"
+ },
+ {
+  "id": "UI/GUIDE",
+  "name": "first-run guide shows, dismisses and stays dismissed",
+  "pass": true,
+  "measured": "visible on first visit",
+  "threshold": "shown once"
+ },
+ {
+  "id": "UI/GUIDE",
+  "name": "guide stays hidden after dismissal",
+  "pass": true,
+  "measured": "hidden after reload",
+  "threshold": "hidden"
+ },
+ {
+  "id": "B2",
+  "name": "files processed in parallel (pool of 3)",
+  "pass": true,
+  "measured": "up to 3 at once",
+  "threshold": "≥ 2"
+ },
+ {
+  "id": "B1",
+  "name": "cancel stops a running file and frees its worker",
+  "pass": true,
+  "measured": "148 ms",
+  "threshold": "< 1000 ms"
+ },
+ {
+  "id": "B1",
+  "name": "damaged and empty files fail with plain-English messages; others continue",
+  "pass": true,
+  "measured": "{\"broken.mp3\": \"This file could not be read. It may be damaged, or its format isn't supported by this browser. Try converting it to WAV or MP3 first.\", \"empty.wav\": \"The file is empty (0 bytes).\"}",
+  "threshold": "2 readable failures"
+ },
+ {
+  "id": "A1",
+  "name": "every other file enhanced (WAV 22–48 kHz, stereo, MP3, MP4 video, WebM)",
+  "pass": true,
+  "measured": "9 done: lesson 01.wav, lesson 02 44k.wav, ক্লাস ৩ 🎙.wav, stereo interview.wav, echo room.wav, duplicate.wav, podcast.mp3, client video.mp4, call.webm",
+  "threshold": "9 done"
+ },
+ {
+  "id": "ENC/VERIFY",
+  "name": "each result decoded again: duration, channels, sample rate",
+  "pass": true,
+  "measured": "all verified",
+  "threshold": "all pass"
+ },
+ {
+  "id": "A4/LUFS",
+  "name": "enhanced loudness on target (files ≥ 8 s, Auto −16)",
+  "pass": true,
+  "measured": "-16.07, -15.99, -16.08, -16.00, -16.10, -16.07, -16.01, -16.09, -15.99",
+  "threshold": "±0.5 LU"
+ },
+ {
+  "id": "B1",
+  "name": "retry re-runs a failed file (still fails cleanly)",
+  "pass": true,
+  "measured": "retried, failed again with the same readable message",
+  "threshold": "no hang"
+ },
+ {
+  "id": "A4",
+  "name": "A/B switch with loudness-matched playback; before/after loudness shown",
+  "pass": true,
+  "measured": "before -19.3, after -16.1 LUFS; louder version turned down by 3.3 dB",
+  "threshold": "switches, matched"
+ },
+ {
+  "id": "A7",
+  "name": "before/after spectrograms drawn",
+  "pass": true,
+  "measured": "57600 lit pixels",
+  "threshold": "> 1000"
+ },
+ {
+  "id": "B3",
+  "name": "ZIP of all results opens in Python zipfile, CRC ok, UTF-8 names, duplicates kept",
+  "pass": true,
+  "measured": "9 files, CRC errors: None, e.g. ক্লাস ৩ 🎙_enhanced.wav",
+  "threshold": "9 files, valid"
+ },
+ {
+  "id": "B3",
+  "name": "naming template applied",
+  "pass": true,
+  "measured": "lesson 01_enhanced.wav",
+  "threshold": "{name}_enhanced.{ext}"
+ },
+ {
+  "id": "A5",
+  "name": "stems: voice and removed background downloads, same length",
+  "pass": true,
+  "measured": "10.000 s / 10.000 s",
+  "threshold": "both 10 s"
+ },
+ {
+  "id": "A2",
+  "name": "save, export (JSON) user presets; Custom when a slider moves",
+  "pass": true,
+  "measured": "{\"Taufiq lesson\": {\"strength\": 100, \"noise\": 100, \"echo\": 60, \"background\": 4, \"clarity\": 80, \"warmth\": 55, \"deess\": 50,",
+  "threshold": "saved + exported"
+ },
+ {
+  "id": "A2",
+  "name": "import presets from JSON",
+  "pass": true,
+  "measured": "Imported warm appears",
+  "threshold": "imported"
+ },
+ {
+  "id": "B5",
+  "name": "after a reload, the queue says which files to add again; re-adding resumes",
+  "pass": true,
+  "measured": "needs-file: Add “long 60s.wav” again to continue. Turn on “Keep files” in Advanced settings to resume automati",
+  "threshold": "clear message, resumes"
+ },
+ {
+  "id": "B5",
+  "name": "“Keep files” resumes automatically after a reload",
+  "pass": true,
+  "measured": "echo room.wav resumed and finished",
+  "threshold": "auto resume"
+ },
+ {
+  "id": "B1/FOLDER",
+  "name": "whole folder (with sub-folder) added; non-audio skipped",
+  "pass": true,
+  "measured": "2 audio files from the folder; notes.txt skipped",
+  "threshold": "audio only"
+ },
+ {
+  "id": "UI/KEYS",
+  "name": "shortcut 2 switches to Convert (URL hash, back button works)",
+  "pass": true,
+  "measured": "hash #convert",
+  "threshold": "switches"
+ },
+ {
+  "id": "C1",
+  "name": "convert to WAV from lesson 02 44k.wav",
+  "pass": true,
+  "measured": "pcm_s24le 44100 Hz 1 ch 10.000 s, title পাঠ ১",
+  "threshold": "10.0 s ±50 ms, decodes"
+ },
+ {
+  "id": "C1",
+  "name": "convert to FLAC from lesson 02 44k.wav",
+  "pass": true,
+  "measured": "flac 44100 Hz 1 ch 10.000 s, title পাঠ ১",
+  "threshold": "10.0 s ±50 ms, decodes"
+ },
+ {
+  "id": "C1",
+  "name": "convert to MP3 from client video.mp4",
+  "pass": true,
+  "measured": "mp3 48000 Hz 1 ch 9.024 s, title পাঠ ১",
+  "threshold": "9.0 s ±50 ms, decodes"
+ },
+ {
+  "id": "C1",
+  "name": "convert to OPUS from lesson 02 44k.wav",
+  "pass": true,
+  "measured": "opus 48000 Hz 1 ch 10.007 s, title None",
+  "threshold": "10.0 s ±50 ms, decodes"
+ },
+ {
+  "id": "C1",
+  "name": "convert to OGG from lesson 02 44k.wav",
+  "pass": true,
+  "measured": "opus 48000 Hz 1 ch 10.007 s, title None",
+  "threshold": "10.0 s ±50 ms, decodes"
+ },
+ {
+  "id": "C2",
+  "name": "normalize −16 LUFS + trim silence + 44.1 kHz + stereo",
+  "pass": true,
+  "measured": "-15.7 LUFS, 44100 Hz, 2 ch, 8.25 s (trimmed from 10 s)",
+  "threshold": "−16 ±0.5, trimmed"
+ },
+ {
+  "id": "D1",
+  "name": "Mic Check reports level, noise, echo, distance and recommends a preset",
+  "pass": true,
+  "measured": "✓ | Good level (-20 dBFS) | Your speaking level is in the ideal range. | ✓ | Some background noise (-54 dBFS) | Fine for Enhance, which will clean it up. | ✓ | Room echo is low | Your room sounds fairly dry. | ✓ | Distance looks right | You",
+  "threshold": "plain advice + preset"
+ },
+ {
+  "id": "D2",
+  "name": "record, then Auto enhance in one step; undo keeps the original take",
+  "pass": true,
+  "measured": "take enhanced; undo switched back to the original",
+  "threshold": "works"
+ },
+ {
+  "id": "D3",
+  "name": "auto cut shortens long silences",
+  "pass": true,
+  "measured": "{\"kind\": \"enhance\", \"autocut\": true, \"cuts\": {\"cuts\": 1, \"removedSec\": 0.85}, \"frames\": 403515}",
+  "threshold": "> 0 pauses shortened"
+ },
+ {
+  "id": "UI/KEYS",
+  "name": "shortcuts are customisable (A/B moved to K)",
+  "pass": true,
+  "measured": "true → false",
+  "threshold": "toggles"
+ },
+ {
+  "id": "UI/KBD",
+  "name": "whole Enhance flow by keyboard only (Tab to “Choose files”, Enter, Tab/Enter to download)",
+  "pass": true,
+  "measured": "duplicate_enhanced.wav",
+  "threshold": "downloads"
+ },
+ {
+  "id": "OFFLINE",
+  "name": "after one visit, app shell + Standard tier work with no network",
+  "pass": true,
+  "measured": "processed a file offline; indicator: “Offline: everything still works”",
+  "threshold": "works offline"
+ },
+ {
+  "id": "UI/SHOTS",
+  "name": "screenshots at 360, 768, 1280, 1920 px",
+  "pass": true,
+  "measured": "tests/report/screens/",
+  "threshold": "saved for review"
+ },
+ {
+  "id": "PERF",
+  "name": "longest main-thread task during the whole run",
+  "pass": true,
+  "measured": "0 ms",
+  "threshold": "≤ 100 ms"
+ },
+ {
+  "id": "CSP",
+  "name": "strict Content-Security-Policy: zero violations",
+  "pass": true,
+  "measured": "none",
+  "threshold": "0"
+ },
+ {
+  "id": "CLEAN",
+  "name": "zero console errors and failed requests",
+  "pass": true,
+  "measured": "none",
+  "threshold": "0"
+ },
+ {
+  "id": "A11Y",
+  "name": "axe-core: zero serious or critical violations",
+  "pass": true,
+  "measured": "{\"enhance\": [], \"convert\": [], \"mic\": []}",
+  "threshold": "0"
+ }
+]

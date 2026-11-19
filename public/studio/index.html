@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Enhance Studio: clean up voice recordings in your browser</title>
+<meta name="description" content="Free, private voice enhancement: remove noise and room echo, even out volume and export in any format. Works offline. Nothing is uploaded.">
+<meta name="theme-color" content="#0d0b1a">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/studio.css">
+<link rel="modulepreload" href="js/app.js">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="topbar">
+  <a class="brand" href="../index.html" aria-label="Enhance Studio, back to the recorder home">
+    <svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b5cf6"/><stop offset=".55" stop-color="#ec4899"/><stop offset="1" stop-color="#f59e0b"/></linearGradient></defs><rect x="1" y="1" width="30" height="30" rx="9" fill="url(#lg)"/><rect x="7" y="12" width="3" height="8" rx="1.5" fill="#fff"/><rect x="12" y="8" width="3" height="16" rx="1.5" fill="#fff"/><rect x="17" y="11" width="3" height="10" rx="1.5" fill="#fff"/><circle cx="24.5" cy="16" r="3" fill="#fff"/></svg>
+    <span class="wordmark">Enhance Studio</span>
+  </a>
+  <nav class="tabs" aria-label="Modes">
+    <a href="../index.html" class="tab">Record and Edit</a>
+    <a href="#enhance" class="tab" data-tab="enhance">Enhance</a>
+    <a href="#convert" class="tab" data-tab="convert">Convert</a>
+    <a href="#mic" class="tab" data-tab="mic">Mic Check</a>
+  </nav>
+  <div class="top-right">
+    <span id="netState" class="net" aria-live="polite"></span>
+    <button class="icon-btn" id="btnKeys" type="button" aria-label="Keyboard shortcuts">⌨</button>
+  </div>
+</header>
+
+<main id="main">
+  <!-- ENHANCE -->
+  <section class="page" id="page-enhance" aria-labelledby="h-enh">
+    <div class="hero glass">
+      <div class="hero-text">
+        <h1 id="h-enh">Make any voice recording sound studio-clean</h1>
+        <p>Removes background noise and room echo, smooths harsh S sounds and evens out the volume. Your audio never leaves this device.</p>
+      </div>
+      <div class="drop" id="dropEnh" aria-describedby="dropEnhHelp">
+        <svg viewBox="0 0 24 24" aria-hidden="true" class="drop-icon"><path d="M12 3v12m0-12 4.5 4.5M12 3 7.5 7.5M4 15v3a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-3"/></svg>
+        <strong>Drop audio or video here, or a whole folder</strong>
+        <span id="dropEnhHelp">WAV, MP3, M4A, FLAC, OGG, Opus, WebM, AIFF, MP4, MOV, MKV</span>
+        <div class="drop-actions">
+          <button class="btn primary" type="button" data-pick="enhance">Choose files</button>
+          <button class="btn" type="button" data-pickdir="enhance">Choose a folder</button>
+        </div>
+      </div>
+    </div>
+
+    <ol class="guide glass" id="guide" hidden>
+      <li><b>Add files.</b> Drop them above, or a whole folder.</li>
+      <li><b>Pick a preset.</b> Auto listens first and chooses for you.</li>
+      <li><b>Download.</b> One file at a time, or everything as a ZIP.</li>
+      <li class="guide-close"><button class="btn ghost" type="button" id="guideClose">Got it</button></li>
+    </ol>
+
+    <div class="layout">
+      <aside class="controls glass" id="controls" aria-label="Enhance settings">
+        <h2 class="h2">Preset</h2>
+        <div class="presets" id="presets" role="radiogroup" aria-label="Presets"></div>
+        <p class="hint" id="presetHint"></p>
+        <div class="field"><label for="c-strength">Overall strength <output id="o-strength"></output></label><input type="range" id="c-strength" min="0" max="100" data-ctl="strength" aria-describedby="t-strength"><small id="t-strength">0% leaves the recording untouched; 100% applies the full preset.</small></div>
+        <div class="row2">
+          <div class="field"><label for="target">Loudness target</label><select id="target" data-ctl="target"><option value="-14">−14 LUFS: YouTube, Spotify</option><option value="-16">−16 LUFS: podcasts</option><option value="-19">−19 LUFS: mono podcast</option><option value="-20">−20 LUFS: audiobook</option><option value="-23">−23 LUFS: broadcast</option></select></div>
+          <div class="field"><label for="fmt">Save as</label><select id="fmt" data-out="format"></select></div>
+        </div>
+        <details class="adv" id="adv">
+          <summary>Advanced settings</summary>
+          <div id="sliders"></div>
+          <div class="row2">
+            <div class="field"><label for="ceiling">Peak ceiling</label><select id="ceiling" data-ctl="ceiling"><option value="-1">−1 dBTP</option><option value="-1.5">−1.5 dBTP</option><option value="-2">−2 dBTP</option><option value="-3">−3 dBTP (ACX)</option></select></div>
+            <div class="field"><label for="tier">Quality tier</label><select id="tier" data-ctl="tier"><option value="standard">Standard: full chain</option><option value="fast">Fast: AI noise removal and tone</option></select></div>
+          </div>
+          <p class="hint" id="tierSpeed">Speed on this device is measured after your first file.</p>
+          <div class="row2">
+            <div class="field"><label for="bits">Bit depth</label><select id="bits" data-out="bits"><option value="16">16-bit</option><option value="24">24-bit</option><option value="32">32-bit float</option></select></div>
+            <div class="field"><label for="kbps">Bitrate</label><select id="kbps" data-out="kbps"><option value="128">128 kbps</option><option value="160">160 kbps</option><option value="192">192 kbps</option><option value="256">256 kbps</option><option value="320">320 kbps</option></select></div>
+          </div>
+          <div class="row2">
+            <div class="field"><label for="rate">Sample rate</label><select id="rate" data-out="rate"><option value="0">Same as the file</option><option value="44100">44.1 kHz</option><option value="48000">48 kHz</option></select></div>
+            <div class="field"><label for="channels">Channels</label><select id="channels" data-out="channels"><option value="auto">Same as the file</option><option value="mono">Mono</option><option value="stereo">Stereo</option></select></div>
+          </div>
+          <label class="check"><input type="checkbox" id="stems" data-out="stems"> Also save the voice and the removed background as separate files</label>
+          <label class="check"><input type="checkbox" id="autocut" data-out="autocut"> Shorten long silences (pauses over 0.8 s become 0.4 s)</label>
+          <div class="field"><label for="naming">File names</label><input id="naming" data-out="naming" spellcheck="false" aria-describedby="t-naming"><small id="t-naming">Use {name} and {ext}. Example: {name}_enhanced.{ext}</small></div>
+          <div class="row2">
+            <div class="field"><label for="workers">Files at once</label><select id="workers" data-out="workers"></select></div>
+            <label class="check tight"><input type="checkbox" id="keepFiles" data-out="keep"> Keep files so the queue can resume after a reload</label>
+          </div>
+          <div class="preset-io">
+            <button class="btn small" type="button" id="savePreset">Save as my preset</button>
+            <button class="btn small" type="button" id="exportPresets">Export presets</button>
+            <button class="btn small" type="button" id="importPresets">Import presets</button>
+            <input type="file" id="importFile" accept="application/json,.json" hidden>
+          </div>
+        </details>
+        <p class="privacy">🔒 Files are processed on this device. Nothing is uploaded.</p>
+      </aside>
+
+      <section class="queue-wrap" aria-labelledby="h-queue">
+        <div class="batch glass" id="batchBar">
+          <h2 class="h2" id="h-queue">Queue</h2>
+          <div class="overall" aria-live="polite" id="overall">No files yet.</div>
+          <div class="batch-actions">
+            <button class="btn" type="button" id="applyAll">Use these settings for all</button>
+            <button class="btn" type="button" id="clearDone">Clear finished</button>
+            <button class="btn primary" type="button" id="zipAll" disabled>Download all as ZIP</button>
+          </div>
+        </div>
+        <ul class="queue" id="queue-enhance" aria-label="Files to enhance"></ul>
+        <p class="empty" id="empty-enhance">Your files will appear here. Each one shows its progress, a before-and-after player and a download button.</p>
+      </section>
+    </div>
+  </section>
+
+  <!-- CONVERT -->
+  <section class="page" id="page-convert" aria-labelledby="h-conv" hidden>
+    <div class="hero glass slim">
+      <div class="hero-text"><h1 id="h-conv">Convert audio and video</h1><p>Change format, sample rate or channels without enhancing. Audio is extracted from video files.</p></div>
+      <div class="drop" id="dropConv">
+        <strong>Drop files to convert</strong><span>Audio or video, one file or many</span>
+        <div class="drop-actions"><button class="btn primary" type="button" data-pick="convert">Choose files</button><button class="btn" type="button" data-pickdir="convert">Choose a folder</button></div>
+      </div>
+    </div>
+    <div class="layout">
+      <aside class="controls glass" aria-label="Convert settings">
+        <div class="field"><label for="cv-fmt">Format</label><select id="cv-fmt"></select></div>
+        <div class="row2">
+          <div class="field"><label for="cv-bits">Bit depth</label><select id="cv-bits"><option value="16">16-bit</option><option value="24" selected>24-bit</option><option value="32">32-bit float</option></select></div>
+          <div class="field"><label for="cv-kbps">Bitrate</label><select id="cv-kbps"><option value="128">128 kbps</option><option value="192" selected>192 kbps</option><option value="256">256 kbps</option><option value="320">320 kbps</option></select></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label for="cv-rate">Sample rate</label><select id="cv-rate"><option value="0">Same as the file</option><option value="22050">22.05 kHz</option><option value="44100">44.1 kHz</option><option value="48000">48 kHz</option></select></div>
+          <div class="field"><label for="cv-ch">Channels</label><select id="cv-ch"><option value="auto">Same as the file</option><option value="mono">Mono</option><option value="stereo">Stereo</option></select></div>
+        </div>
+        <label class="check"><input type="checkbox" id="cv-norm"> Normalize loudness to <select id="cv-target" aria-label="Loudness target"><option value="-14">−14 LUFS</option><option value="-16" selected>−16 LUFS</option><option value="-23">−23 LUFS</option></select></label>
+        <label class="check"><input type="checkbox" id="cv-trim"> Trim silence at the start and end</label>
+        <div class="row2">
+          <div class="field"><label for="cv-title">Title</label><input id="cv-title"></div>
+          <div class="field"><label for="cv-artist">Artist</label><input id="cv-artist"></div>
+        </div>
+        <div class="field"><label for="cv-cover">Cover image (MP3, FLAC, M4A)</label><input type="file" id="cv-cover" accept="image/jpeg,image/png"></div>
+        <p class="hint" id="cv-note"></p>
+        <p class="privacy">🔒 Converted on this device. Nothing is uploaded.</p>
+      </aside>
+      <section class="queue-wrap">
+        <div class="batch glass"><h2 class="h2">Converted files</h2><div class="overall" id="overall-convert" aria-live="polite">No files yet.</div><div class="batch-actions"><button class="btn primary" type="button" id="zipConv" disabled>Download all as ZIP</button></div></div>
+        <ul class="queue" id="queue-convert" aria-label="Files to convert"></ul>
+        <p class="empty" id="empty-convert">Converted files appear here.</p>
+      </section>
+    </div>
+  </section>
+
+  <!-- MIC CHECK -->
+  <section class="page" id="page-mic" aria-labelledby="h-mic" hidden>
+    <div class="mic-grid">
+      <div class="glass mic-card">
+        <h1 id="h-mic">Mic Check</h1>
+        <p>Speak normally for 15 seconds, as you would in a lesson. You'll get plain advice on level, background noise, echo and distance, plus the best preset for your setup.</p>
+        <div class="field"><label for="micDevice">Microphone</label><select id="micDevice"><option value="">Default microphone</option></select></div>
+        <div class="meter" aria-hidden="true"><div class="meter-fill" id="micMeter"></div></div>
+        <div class="row">
+          <button class="btn primary" type="button" id="micStart">Start 15-second check</button>
+          <span class="countdown" id="micCount" aria-live="polite"></span>
+        </div>
+        <div id="micReport" class="mic-report" aria-live="polite"></div>
+      </div>
+      <div class="glass mic-card">
+        <h2 class="h2">Record and enhance in one step</h2>
+        <p>Record a take; when you stop, Auto enhance runs and the cleaned take appears in the Enhance queue. You can always switch back to the original.</p>
+        <div class="row"><button class="btn rec" type="button" id="recBtn"><span class="dot" aria-hidden="true"></span>Record</button><span class="countdown" id="recTime" aria-live="off"></span></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<dialog id="keysDialog" class="dialog">
+  <form method="dialog">
+    <h2>Keyboard shortcuts</h2>
+    <p class="hint">Select a shortcut and press a new key to change it.</p>
+    <table class="keys" id="keysTable"></table>
+    <div class="row end"><button class="btn" type="button" id="keysReset">Reset</button><button class="btn primary" value="close">Done</button></div>
+  </form>
+</dialog>
+<dialog id="noiseDialog" class="dialog">
+  <form method="dialog">
+    <h2>Teach the noise remover</h2>
+    <p class="hint">Drag across a part with no speaking, only room noise. Then enhance again.</p>
+    <canvas id="noiseCanvas" class="noise-canvas" aria-label="Waveform. Drag to select a quiet part."></canvas>
+    <p id="noiseSel" class="hint" aria-live="polite">Nothing selected.</p>
+    <div class="row end"><button class="btn ghost" value="cancel">Cancel</button><button class="btn primary" value="ok" id="noiseOk" disabled>Use this and enhance again</button></div>
+  </form>
+</dialog>
+<input type="file" id="pickFiles" multiple accept="audio/*,video/*,.wav,.mp3,.m4a,.aac,.flac,.ogg,.oga,.opus,.webm,.aif,.aiff,.mp4,.mov,.mkv,.3gp" hidden>
+<input type="file" id="pickDir" webkitdirectory multiple hidden>
+<div id="sr" class="sr-only" aria-live="polite"></div>
+<div id="toast" class="toast" role="status" hidden></div>
+<noscript><p class="noscript">Enhance Studio needs JavaScript.</p></noscript>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

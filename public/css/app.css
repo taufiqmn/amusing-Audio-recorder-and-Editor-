@@ -288,3 +288,6 @@ kbd {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+a.btn { text-decoration: none; color: inherit; }
+.studio-link { background: linear-gradient(120deg, #8b5cf6, #ec4899 55%, #f59e0b); color: #fff; border-color: transparent; font-weight: 600; }

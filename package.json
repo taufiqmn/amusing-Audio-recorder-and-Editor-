@@ -1,12 +1,14 @@
 {
   "name": "takeflow",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "Takeflow: browser voice recorder and editor with punch-in recording, AI noise removal and studio presets.",
   "type": "module",
   "scripts": {
     "test": "node tests/run-all.mjs",
-    "serve": "npx --yes http-server public -p 8080 -c-1"
+    "test:e2e": "bash tests/run-e2e.sh",
+    "test:long": "node tests/long.mjs 10 60",
+    "serve": "python3 tests/serve.py 8080 public"
   },
   "license": "MIT"
 }

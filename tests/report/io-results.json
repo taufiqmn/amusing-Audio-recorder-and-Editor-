@@ -1,0 +1,79 @@
+[
+ {
+  "id": "B4/RS",
+  "name": "polyphase resampler 44.1→48 kHz accuracy",
+  "pass": true,
+  "measured": "max error 1.1e-7, 96000 samples",
+  "threshold": "< 1e-3, 96000 ±1"
+ },
+ {
+  "id": "B4/RS",
+  "name": "resampler gives the same result in 777-sample blocks",
+  "pass": true,
+  "measured": "max diff 2.1e-7",
+  "threshold": "< 1e-6"
+ },
+ {
+  "id": "C1/READ",
+  "name": "WAV header + streaming read (16-bit stereo)",
+  "pass": true,
+  "measured": "2 ch, 44100 Hz, 132300/132300 frames",
+  "threshold": "exact"
+ },
+ {
+  "id": "C1/READ",
+  "name": "AIFF header + big-endian samples",
+  "pass": true,
+  "measured": "44100 Hz, 22050 frames",
+  "threshold": "parsed exactly"
+ },
+ {
+  "id": "C1/WAV",
+  "name": "WAV 16-bit round trip bit-exact (with INFO tags)",
+  "pass": true,
+  "measured": "identical",
+  "threshold": "bit-exact"
+ },
+ {
+  "id": "C1/WAV",
+  "name": "WAV 32-bit float stereo round trip bit-exact",
+  "pass": true,
+  "measured": "identical",
+  "threshold": "bit-exact"
+ },
+ {
+  "id": "C1/FLAC",
+  "name": "FLAC round trip bit-exact, title/artist/cover tags readable",
+  "pass": true,
+  "measured": "identical, tags {\"TITLE\":\"Lesson 1\",\"ARTIST\":\"Taufiq\"}",
+  "threshold": "bit-exact + tags"
+ },
+ {
+  "id": "C1/MP3",
+  "name": "MP3 128 kbps 1 ch @44100: decodes, duration, ID3",
+  "pass": true,
+  "measured": "mp3 44100 Hz 1 ch 5.042 s, title \"বাংলা পাঠ\"",
+  "threshold": "mp3, ±50 ms, tags"
+ },
+ {
+  "id": "C1/MP3",
+  "name": "MP3 320 kbps 2 ch @48000: decodes, duration, ID3",
+  "pass": true,
+  "measured": "mp3 48000 Hz 2 ch 5.040 s, title \"বাংলা পাঠ\"",
+  "threshold": "mp3, ±50 ms, tags"
+ },
+ {
+  "id": "C1/M4A",
+  "name": "M4A muxer: valid MP4, AAC decodes, tags",
+  "pass": true,
+  "measured": "aac 48000 Hz, 4.032 s, decode errors: none",
+  "threshold": "valid"
+ },
+ {
+  "id": "B3/ZIP",
+  "name": "ZIP passes unzip -t and Python zipfile; UTF-8 names; duplicate renamed",
+  "pass": true,
+  "measured": "unzip -t ok, পাঠ ১_enhanced.wav|clip 🎙.mp3|same.wav|same (2).wav|empty.txt / b'b'",
+  "threshold": "valid, names intact"
+ }
+]

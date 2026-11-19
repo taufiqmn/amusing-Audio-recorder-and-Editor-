@@ -10,98 +10,69 @@ The home page (`public/index.html`) is a **timeline editor**: audio lives on a t
 - **Shortcuts are customizable**: click *Shortcuts* in the header, pick an action, press the new keys. Saved in the browser; works on any keyboard layout (keys are matched by physical position).
 - **Enhance** (AI noise removal, presets, loudness) with an original/enhanced switch (**B**), and **Export** to WAV, FLAC, MP3 or Opus.
 
-The original single-waveform editor is still available at `/classic` (`public/classic.html`). Both share the code in `public/js/`.
+- **Enhance Studio** at `/studio/`: bulk enhance (folders, presets, Auto, A/B, spectrograms, stems, ZIP), Convert (WAV, FLAC, MP3, M4A, Opus, OGG, video audio extraction) and Mic Check. It has its own engine in `public/studio/` and a strict Content-Security-Policy.
+
+The original single-waveform editor is still available at `/classic` (`public/classic.html`). It shares `public/js/` with the timeline editor.
+
 
 ---
 
-# Takeflow
+# Takeflow + Enhance Studio
 
-A voice recorder and editor that runs entirely in the browser. Record, stop at a mistake, and re-record from that exact point with a click-free join. Clean up the result with AI noise removal and one-click presets, then export studio-quality WAV, FLAC, MP3 or Opus. Nothing is uploaded: audio stays on the user's device.
+A free, private audio workshop that runs entirely in the browser. Nothing is uploaded: every recording is processed on your own device, and the app keeps working offline after the first visit. It deploys as a static site with no build step.
 
-## Features
+## The four modes
 
-**Recording**
-- Captures raw 32-bit float audio through an AudioWorklet, with the browser's echo, noise and gain processing turned off for the cleanest sound (can be switched on).
-- Saves takes in chunks every half second while recording, so a crash or closed tab never loses a take; it is restored on the next visit.
-- Input meter with level advice, clipping warning, device picker, and a Bluetooth-headset quality warning.
+**Record and Edit** (`/`, the Takeflow editor). Record, stop at a mistake, put the cursor just before it and record again: the new take replaces the rest with a click-free join. Select a section to delete it or re-record only that part. Includes undo, pause shortening, a one-click Enhance panel and export to WAV, FLAC, MP3 or Opus.
 
-**Punch-in editing: record, cut, record again from anywhere**
-- Put the cursor anywhere (or stop playback where you hear a mistake) and press record. Choose whether the new take replaces everything after the cursor, overwrites only its own length, or inserts.
-- Select a section and press record to replace just that section.
-- Plays a 2-second run-up before the punch point, with latency compensation so the new take lines up with what you heard.
-- Equal-power crossfades at every splice, so there are no clicks.
-- Non-destructive: unlimited undo and redo, instant cuts even on long files.
-- Delete, keep only the selection, select all, and automatically shorten long pauses.
+**Enhance** (`/studio/#enhance`). Drop one file, many files or a whole folder of audio or video. Pick a preset (or Auto, which listens first) and get cleaned, loudness-correct files back. Every file shows live progress with time left, a before-and-after player whose volume is matched so you judge quality rather than loudness, and before/after spectrograms. Download files one by one or all as one ZIP. Optional: separate "voice only" and "removed background" files, a noise sample you mark by dragging over a quiet part, and shortening of long silences.
 
-**Enhance (Adobe Podcast–style)**
-- AI noise removal (RNNoise, WebAssembly), pause cleanup, de-esser, tone shaping, compression, loudness normalisation (ITU-R BS.1770 / EBU R128) and a look-ahead peak limiter.
-- Presets: Podcast (−16 LUFS), YouTube and video (−14), Audiobook (−20, ACX-friendly peaks), Warm radio, Phone and laptop mic fix, Light touch, Volume only.
-- A strength slider and fine-tune controls, and a seamless A/B comparison while playing (press B).
+**Convert** (`/studio/#convert`). Change format, sample rate or channels without enhancing; extract audio from video; optionally normalize loudness, trim silence and add title, artist and cover art.
 
-**Export**
-- WAV 16-bit, 24-bit or 32-bit float, with TPDF dither.
-- FLAC 16-bit or 24-bit (lossless, about half the size of WAV).
-- MP3 at 128 to 320 kbps.
-- Opus in Ogg at 64 to 192 kbps (in browsers with WebCodecs).
-- Mono or stereo, project rate, 44.1 kHz or 48 kHz, and whole file or selection only.
+**Mic Check** (`/studio/#mic`). Speak for 15 seconds and get plain advice on level, background noise, hum, room echo and distance, plus the best preset for your setup. The same page records a take and enhances it in one step (with undo back to the original).
 
-**Other**
-- Opens WAV, MP3, M4A, FLAC, Ogg and WebM files (drag and drop works too).
-- Installable app that works offline after the first visit.
-- Light and dark themes, responsive down to phones, keyboard shortcuts (press ? in the app).
+### Presets
+Auto · Podcast · Interview · YouTube narration · Lecture or classroom · Audiobook · Phone or Zoom call · Singing or vocal · Music-friendly · Custom. Save your own, rename by saving under a new name, and export or import them as JSON.
 
-## Project layout
+### Controls (all free)
+Overall strength (0 % = untouched), noise removal, echo and room removal, background level, clarity, warmth, de-esser, volume evening, loudness target (LUFS), true-peak ceiling, quality tier (Standard or Fast), output format, bit depth, bitrate, sample rate, channels, file-name template (`{name}_enhanced.{ext}`), files processed at once, and "keep files" so the queue resumes after a reload.
 
-```
-public/            the website (deploy this folder as-is; no build step)
-  index.html
-  css/app.css
-  js/app.js          interface controller
-  js/engine.js       non-destructive timeline, edits, undo, crossfaded rendering
-  js/recorder.js     microphone capture (+ worklets/recorder-worklet.js)
-  js/waveform.js     waveform, ruler, selection, overview
-  js/player.js       playback with A/B switching
-  js/dsp.js          filters, loudness meter, compressor, gate, de-esser, limiter, resampler
-  js/enhance.js      enhancement chain   js/presets.js  preset values
-  js/encoders.js     WAV, FLAC and Ogg Opus writers
-  js/workers/        enhancement and export run off the main thread
-  js/vendor/         RNNoise (WASM) and lamejs (MP3)
-  sw.js, manifest.webmanifest, icons/
-tests/             Node unit tests and a browser end-to-end test
-vercel.json, netlify.toml, public/_headers, .github/workflows/pages.yml
-```
+### Formats
+| | Formats |
+|---|---|
+| In | WAV, AIFF (streamed, any length), MP3, M4A, AAC, FLAC, OGG/OGA, Opus, WebM, MP4, MOV, MKV, 3GP (decoded by the browser) |
+| Out | WAV 16/24/32-bit float, FLAC 16/24-bit, MP3 128–320 kbps, AAC in M4A, Opus, OGG (Opus codec) |
 
-## Run locally
-
-Any static file server works. The microphone only works on `https://` or `http://localhost`.
-
-```
-npm run serve        # http://localhost:8080
-# or: cd public && python3 -m http.server 8080
-```
-
-## Deploy
-
-The site is static. Publish the `public/` folder on any host that serves HTTPS.
-
-- **Vercel:** import the repository. `vercel.json` already sets the output directory to `public` with no build.
-- **Netlify:** import the repository. `netlify.toml` already sets `publish = "public"`.
-- **Cloudflare Pages:** build command empty, output directory `public`.
-- **GitHub Pages:** push to `main`, then in Settings → Pages choose "GitHub Actions". The included workflow deploys `public/`.
-
-## Tests
-
-```
-npm test                       # DSP, enhancement, encoders, timeline (needs ffmpeg)
-python3 tests/e2e_browser.py   # full browser run with a simulated microphone (needs Playwright)
-```
-
-The unit tests check the loudness meter against ffmpeg's EBU R128 meter, verify that FLAC is bit-exact lossless, decode every export format with ffmpeg, and confirm noise removal stays sample-aligned. The browser test records, punches in, cuts, undoes, enhances, exports every format, reloads, and simulates a crash mid-recording.
+## Keyboard shortcuts (Studio; change them with the ⌨ button)
+`O` add files · `F` add a folder · `P` play/pause the latest result · `B` original/enhanced · `Z` download all as ZIP · `C` clear finished · `1` `2` `3` switch mode · `?` show shortcuts. The editor's own shortcuts are listed under `?` on its page.
 
 ## Browser support
+Tested automatically in Chromium (Chrome, Edge). Behaviour elsewhere follows from the features each browser exposes:
 
-Current Chrome, Edge, Firefox and Safari (desktop and mobile). Opus export needs WebCodecs (Chrome and Edge, recent Safari); the option is hidden where it isn't available.
+| Feature | Chrome / Edge | Safari 16.4+ | Firefox |
+|---|---|---|---|
+| Enhance, Convert, Mic Check, WAV/FLAC/MP3 output | yes | yes | yes |
+| AAC (M4A), Opus, OGG output | yes | needs WebCodecs AudioEncoder; hidden if missing | hidden (no AAC/Opus WebCodecs encoder) |
+| MKV input | yes | usually not decodable; shows a clear error | WebM yes, MKV varies |
+| Folder drop | yes | yes | yes |
 
-## Licence
+Firefox and WebKit were not available in the build environment, so the table above is derived from their published feature support, not from a test run. Formats a browser can't write are hidden with an explanation; they never fail at the end.
 
-Takeflow's own code is MIT licensed (see LICENSE). Bundled libraries keep their own licences; see THIRD_PARTY_NOTICES.md.
+## Run locally
+```
+npm run serve            # http://localhost:8080 (the microphone needs localhost or https)
+```
+
+## Tests
+```
+npm test                 # unit + objective audio checks (needs ffmpeg; about 6 minutes)
+npm run test:e2e         # browser tests, editor + Studio (needs Python Playwright + Chromium)
+npm run test:long        # 10-minute and 1-hour memory and speed test
+```
+Results are written to `tests/report/`. `TEST_REPORT.md` summarises them; `tests/report/listen.html` lets you compare before and after by ear.
+
+## Deploy
+Push to GitHub and import into Vercel with default settings: `vercel.json` sets the output folder (`public`), no build, and the security headers (a strict Content-Security-Policy for `/studio/`). Netlify (`netlify.toml`) and Cloudflare Pages (`public/_headers`) are configured the same way.
+
+## Honest limits
+Adobe Podcast uses a large cloud neural network; this app uses a classic log-MMSE spectral denoiser, RNNoise (a small neural network) and signal processing, all in the browser. Measured results are in `TEST_REPORT.md`; known gaps are listed there.

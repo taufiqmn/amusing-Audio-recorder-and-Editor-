@@ -1,0 +1,783 @@
+{
+ "results": [
+  {
+   "id": "A1/NR",
+   "name": "SI-SDR gain, hiss @0 dB",
+   "pass": true,
+   "measured": "-4.3 → 6.2 dB (+10.5)",
+   "threshold": "≥ +6 dB"
+  },
+  {
+   "id": "A1/NR",
+   "name": "SI-SDR gain, hiss @5 dB",
+   "pass": true,
+   "measured": "-0.4 → 8.6 dB (+9.0)",
+   "threshold": "≥ +6 dB"
+  },
+  {
+   "id": "A1/NR",
+   "name": "SI-SDR gain, hiss @10 dB",
+   "pass": true,
+   "measured": "2.4 → 10.5 dB (+8.1)",
+   "threshold": "≥ +6 dB"
+  },
+  {
+   "id": "A1/NR",
+   "name": "SI-SDR gain, hum @0 dB",
+   "pass": true,
+   "measured": "-5.1 → 12.2 dB (+17.3)",
+   "threshold": "≥ +6 dB"
+  },
+  {
+   "id": "A1/NR",
+   "name": "SI-SDR gain, hum @5 dB",
+   "pass": true,
+   "measured": "-1.4 → 12.2 dB (+13.7)",
+   "threshold": "≥ +6 dB"
+  },
+  {
+   "id": "A1/NR",
+   "name": "SI-SDR gain, hum @10 dB",
+   "pass": true,
+   "measured": "0.9 → 12.3 dB (+11.4)",
+   "threshold": "≥ +6 dB"
+  },
+  {
+   "id": "A1/NR",
+   "name": "SI-SDR gain, fan @0 dB",
+   "pass": true,
+   "measured": "-4.3 → 7.1 dB (+11.4)",
+   "threshold": "≥ +6 dB"
+  },
+  {
+   "id": "A1/NR",
+   "name": "SI-SDR gain, fan @5 dB",
+   "pass": true,
+   "measured": "-0.4 → 9.2 dB (+9.6)",
+   "threshold": "≥ +6 dB"
+  },
+  {
+   "id": "A1/NR",
+   "name": "SI-SDR gain, fan @10 dB",
+   "pass": true,
+   "measured": "2.4 → 11.0 dB (+8.6)",
+   "threshold": "≥ +6 dB"
+  },
+  {
+   "id": "A1/FLOOR",
+   "name": "noise floor in pauses (relative to speech), hiss @10 dB, Podcast",
+   "pass": true,
+   "measured": "16.8 dB lower",
+   "threshold": "≥ 15 dB"
+  },
+  {
+   "id": "A1/FLOOR",
+   "name": "noise floor in pauses (relative to speech), fan @5 dB, Podcast",
+   "pass": true,
+   "measured": "18.0 dB lower",
+   "threshold": "≥ 15 dB"
+  },
+  {
+   "id": "A1/FLOOR",
+   "name": "noise floor in pauses (relative to speech), hum @5 dB, Podcast",
+   "pass": true,
+   "measured": "37.2 dB lower",
+   "threshold": "≥ 15 dB"
+  },
+  {
+   "id": "A3/ECHO",
+   "name": "estimated RT60 reduction, RT60 0.4 s fixture",
+   "pass": true,
+   "measured": "0.43 → 0.27 s (−37%)",
+   "threshold": "≥ 30% lower"
+  },
+  {
+   "id": "A3/ECHO",
+   "name": "voice-band correlation to dry reference, RT60 0.4 s",
+   "pass": true,
+   "measured": "0.863",
+   "threshold": "≥ 0.85"
+  },
+  {
+   "id": "A3/ECHO",
+   "name": "estimated RT60 reduction, RT60 0.8 s fixture",
+   "pass": true,
+   "measured": "0.80 → 0.45 s (−44%)",
+   "threshold": "≥ 30% lower"
+  },
+  {
+   "id": "A3/ECHO",
+   "name": "voice-band correlation to dry reference, RT60 0.8 s",
+   "pass": true,
+   "measured": "0.852",
+   "threshold": "≥ 0.85"
+  },
+  {
+   "id": "A3/ECHO",
+   "name": "estimated RT60 reduction, RT60 1.2 s fixture",
+   "pass": true,
+   "measured": "1.30 → 0.32 s (−75%)",
+   "threshold": "≥ 30% lower"
+  },
+  {
+   "id": "A3/ECHO",
+   "name": "voice-band correlation to dry reference, RT60 1.2 s",
+   "pass": false,
+   "measured": "0.842",
+   "threshold": "≥ 0.85"
+  },
+  {
+   "id": "A2/NAT",
+   "name": "Auto naturalness vs clean, hiss 10 dB",
+   "pass": true,
+   "measured": "corr 0.918, musical 0.00/s",
+   "threshold": "corr ≥ 0.9, musical ≤ 6/s"
+  },
+  {
+   "id": "A4/LOUD",
+   "name": "Auto loudness on target, hiss 10 dB",
+   "pass": true,
+   "measured": "-16.09 LUFS",
+   "threshold": "−16 ± 0.5"
+  },
+  {
+   "id": "A2/NAT",
+   "name": "Auto naturalness vs clean, fan 5 dB",
+   "pass": false,
+   "measured": "corr 0.893, musical 0.00/s",
+   "threshold": "corr ≥ 0.9, musical ≤ 6/s"
+  },
+  {
+   "id": "A4/LOUD",
+   "name": "Auto loudness on target, fan 5 dB",
+   "pass": true,
+   "measured": "-16.05 LUFS",
+   "threshold": "−16 ± 0.5"
+  },
+  {
+   "id": "A2/NAT",
+   "name": "Auto naturalness vs clean, pink 5 dB",
+   "pass": false,
+   "measured": "corr 0.847, musical 0.00/s",
+   "threshold": "corr ≥ 0.9, musical ≤ 6/s"
+  },
+  {
+   "id": "A4/LOUD",
+   "name": "Auto loudness on target, pink 5 dB",
+   "pass": true,
+   "measured": "-16.04 LUFS",
+   "threshold": "−16 ± 0.5"
+  },
+  {
+   "id": "A2/NAT",
+   "name": "Auto naturalness vs clean, babble 10 dB",
+   "pass": false,
+   "measured": "corr 0.888, musical 0.00/s",
+   "threshold": "corr ≥ 0.9, musical ≤ 6/s"
+  },
+  {
+   "id": "A4/LOUD",
+   "name": "Auto loudness on target, babble 10 dB",
+   "pass": true,
+   "measured": "-16.05 LUFS",
+   "threshold": "−16 ± 0.5"
+  },
+  {
+   "id": "A2/NAT",
+   "name": "Auto naturalness vs clean, reverb 0.8 s",
+   "pass": false,
+   "measured": "corr 0.851, musical 0.00/s",
+   "threshold": "corr ≥ 0.9, musical ≤ 6/s"
+  },
+  {
+   "id": "A4/LOUD",
+   "name": "Auto loudness on target, reverb 0.8 s",
+   "pass": true,
+   "measured": "-16.03 LUFS",
+   "threshold": "−16 ± 0.5"
+  },
+  {
+   "id": "A2/NAT",
+   "name": "Auto naturalness vs clean, clean",
+   "pass": true,
+   "measured": "corr 0.986, musical 0.00/s",
+   "threshold": "corr ≥ 0.9, musical ≤ 6/s"
+  },
+  {
+   "id": "A4/LOUD",
+   "name": "Auto loudness on target, clean",
+   "pass": true,
+   "measured": "-16.02 LUFS",
+   "threshold": "−16 ± 0.5"
+  },
+  {
+   "id": "A3/NULL",
+   "name": "strength 0 returns the input",
+   "pass": true,
+   "measured": "−∞ dB",
+   "threshold": "≤ −90 dB"
+  },
+  {
+   "id": "A3/LUFS",
+   "name": "loudness on target, podcast",
+   "pass": true,
+   "measured": "-16.02 (target -16)",
+   "threshold": "± 0.5 LU"
+  },
+  {
+   "id": "A3/TP",
+   "name": "true peak at or under ceiling, podcast",
+   "pass": true,
+   "measured": "-1.04 dBTP (ceiling -1)",
+   "threshold": "≤ ceiling + 0.1 dB"
+  },
+  {
+   "id": "SAFE",
+   "name": "finite output, DC, length, podcast",
+   "pass": true,
+   "measured": "NaN/Inf 0, DC 2.0e-6, length 960000/960000",
+   "threshold": "no NaN, DC < 0.001, same length"
+  },
+  {
+   "id": "A3/LUFS",
+   "name": "loudness on target, interview",
+   "pass": true,
+   "measured": "-16.08 (target -16)",
+   "threshold": "± 0.5 LU"
+  },
+  {
+   "id": "A3/TP",
+   "name": "true peak at or under ceiling, interview",
+   "pass": true,
+   "measured": "-1.04 dBTP (ceiling -1)",
+   "threshold": "≤ ceiling + 0.1 dB"
+  },
+  {
+   "id": "SAFE",
+   "name": "finite output, DC, length, interview",
+   "pass": true,
+   "measured": "NaN/Inf 0, DC 5.7e-6, length 960000/960000",
+   "threshold": "no NaN, DC < 0.001, same length"
+  },
+  {
+   "id": "A3/LUFS",
+   "name": "loudness on target, youtube",
+   "pass": true,
+   "measured": "-14.01 (target -14)",
+   "threshold": "± 0.5 LU"
+  },
+  {
+   "id": "A3/TP",
+   "name": "true peak at or under ceiling, youtube",
+   "pass": true,
+   "measured": "-1.04 dBTP (ceiling -1)",
+   "threshold": "≤ ceiling + 0.1 dB"
+  },
+  {
+   "id": "SAFE",
+   "name": "finite output, DC, length, youtube",
+   "pass": true,
+   "measured": "NaN/Inf 0, DC 2.2e-5, length 960000/960000",
+   "threshold": "no NaN, DC < 0.001, same length"
+  },
+  {
+   "id": "A3/LUFS",
+   "name": "loudness on target, lecture",
+   "pass": true,
+   "measured": "-16.03 (target -16)",
+   "threshold": "± 0.5 LU"
+  },
+  {
+   "id": "A3/TP",
+   "name": "true peak at or under ceiling, lecture",
+   "pass": true,
+   "measured": "-1.04 dBTP (ceiling -1)",
+   "threshold": "≤ ceiling + 0.1 dB"
+  },
+  {
+   "id": "SAFE",
+   "name": "finite output, DC, length, lecture",
+   "pass": true,
+   "measured": "NaN/Inf 0, DC 3.5e-6, length 960000/960000",
+   "threshold": "no NaN, DC < 0.001, same length"
+  },
+  {
+   "id": "A3/LUFS",
+   "name": "loudness on target, audiobook",
+   "pass": true,
+   "measured": "-20.04 (target -20)",
+   "threshold": "± 0.5 LU"
+  },
+  {
+   "id": "A3/TP",
+   "name": "true peak at or under ceiling, audiobook",
+   "pass": true,
+   "measured": "-3.04 dBTP (ceiling -3)",
+   "threshold": "≤ ceiling + 0.1 dB"
+  },
+  {
+   "id": "SAFE",
+   "name": "finite output, DC, length, audiobook",
+   "pass": true,
+   "measured": "NaN/Inf 0, DC 1.3e-6, length 960000/960000",
+   "threshold": "no NaN, DC < 0.001, same length"
+  },
+  {
+   "id": "A3/LUFS",
+   "name": "loudness on target, phone",
+   "pass": true,
+   "measured": "-16.04 (target -16)",
+   "threshold": "± 0.5 LU"
+  },
+  {
+   "id": "A3/TP",
+   "name": "true peak at or under ceiling, phone",
+   "pass": true,
+   "measured": "-1.04 dBTP (ceiling -1)",
+   "threshold": "≤ ceiling + 0.1 dB"
+  },
+  {
+   "id": "SAFE",
+   "name": "finite output, DC, length, phone",
+   "pass": true,
+   "measured": "NaN/Inf 0, DC 1.3e-6, length 960000/960000",
+   "threshold": "no NaN, DC < 0.001, same length"
+  },
+  {
+   "id": "A3/LUFS",
+   "name": "loudness on target, singing",
+   "pass": true,
+   "measured": "-14.06 (target -14)",
+   "threshold": "± 0.5 LU"
+  },
+  {
+   "id": "A3/TP",
+   "name": "true peak at or under ceiling, singing",
+   "pass": true,
+   "measured": "-1.04 dBTP (ceiling -1)",
+   "threshold": "≤ ceiling + 0.1 dB"
+  },
+  {
+   "id": "SAFE",
+   "name": "finite output, DC, length, singing",
+   "pass": true,
+   "measured": "NaN/Inf 0, DC 3.5e-5, length 960000/960000",
+   "threshold": "no NaN, DC < 0.001, same length"
+  },
+  {
+   "id": "A3/LUFS",
+   "name": "loudness on target, music",
+   "pass": true,
+   "measured": "-14.07 (target -14)",
+   "threshold": "± 0.5 LU"
+  },
+  {
+   "id": "A3/TP",
+   "name": "true peak at or under ceiling, music",
+   "pass": true,
+   "measured": "-1.04 dBTP (ceiling -1)",
+   "threshold": "≤ ceiling + 0.1 dB"
+  },
+  {
+   "id": "SAFE",
+   "name": "finite output, DC, length, music",
+   "pass": true,
+   "measured": "NaN/Inf 0, DC 9.6e-6, length 960000/960000",
+   "threshold": "no NaN, DC < 0.001, same length"
+  },
+  {
+   "id": "SAFE",
+   "name": "stereo balance preserved",
+   "pass": true,
+   "measured": "3.01 → 3.00 dB",
+   "threshold": "within 0.5 dB"
+  },
+  {
+   "id": "A1/STEREO",
+   "name": "dual-mono detected and processed once",
+   "pass": true,
+   "measured": "detected true, identical output true",
+   "threshold": "detected, identical"
+  },
+  {
+   "id": "REPAIR",
+   "name": "clipped input: detected, repaired, no new clipping",
+   "pass": true,
+   "measured": "clip runs fixed 8246, output samples ≥ 0 dBFS 0",
+   "threshold": "repaired, 0 clipped"
+  },
+  {
+   "id": "ANALYSE",
+   "name": "hum frequency detected",
+   "pass": true,
+   "measured": "50 Hz / 60 Hz",
+   "threshold": "50 / 60"
+  },
+  {
+   "id": "ANALYSE",
+   "name": "phone bandwidth detected",
+   "pass": true,
+   "measured": "4078 Hz",
+   "threshold": "3–5.5 kHz"
+  },
+  {
+   "id": "REPAIR",
+   "name": "DC offset removed",
+   "pass": true,
+   "measured": "4.07e-6",
+   "threshold": "< 0.001"
+  },
+  {
+   "id": "A2/LOW",
+   "name": "very low level (−40 dBFS) brought to target",
+   "pass": true,
+   "measured": "-40.2 → -16.03 LUFS",
+   "threshold": "−16 ± 0.5"
+  },
+  {
+   "id": "REPEAT",
+   "name": "enhancing twice costs at most 1 dB SI-SDR",
+   "pass": true,
+   "measured": "8.65 → 7.95 dB",
+   "threshold": "≤ 1 dB loss"
+  },
+  {
+   "id": "B4/SEAM",
+   "name": "chunked (1234 / 7 s blocks) vs one-shot",
+   "pass": true,
+   "measured": "-300.0 / -300.0 dB",
+   "threshold": "≤ −50 dB"
+  },
+  {
+   "id": "B4/SEAM",
+   "name": "sample jump at chunk boundaries vs the same place rendered in one piece",
+   "pass": true,
+   "measured": "1.000×",
+   "threshold": "≤ 1.5×"
+  },
+  {
+   "id": "A5/STEMS",
+   "name": "speech stem is clean speech; background stem is the noise",
+   "pass": true,
+   "measured": "speech SI-SDR 10.1 dB, background vs true noise SI-SDR 2.1 dB",
+   "threshold": "speech +6 dB over input, background > 0 dB"
+  },
+  {
+   "id": "A6/PROFILE",
+   "name": "learned noise sample lowers remaining noise further",
+   "pass": false,
+   "measured": "pause level -16.3 → -15.8 dB rel. speech",
+   "threshold": "≥ 3 dB extra"
+  },
+  {
+   "id": "SPEED",
+   "name": "Standard tier speed (analysis + 2 passes, 1 thread)",
+   "pass": true,
+   "measured": "5.0× real time on Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "threshold": "≥ 2×"
+  }
+ ],
+ "sdrRows": [
+  {
+   "name": "hiss",
+   "snr": 0,
+   "before": -4.323401686616034,
+   "after": 6.191075826521281,
+   "gain": 10.514477513137315,
+   "speed": 4.6274872744099955
+  },
+  {
+   "name": "hiss",
+   "snr": 5,
+   "before": -0.38096660863029713,
+   "after": 8.646446987125078,
+   "gain": 9.027413595755375,
+   "speed": 4.703668861712136
+  },
+  {
+   "name": "hiss",
+   "snr": 10,
+   "before": 2.3568473043472298,
+   "after": 10.48322693837246,
+   "gain": 8.12637963402523,
+   "speed": 4.592422502870264
+  },
+  {
+   "name": "hum",
+   "snr": 0,
+   "before": -5.100155016930174,
+   "after": 12.223020963030823,
+   "gain": 17.323175979960997,
+   "speed": 5.393743257820928
+  },
+  {
+   "name": "hum",
+   "snr": 5,
+   "before": -1.4361339237458752,
+   "after": 12.239779883198153,
+   "gain": 13.675913806944028,
+   "speed": 5.511160099200882
+  },
+  {
+   "name": "hum",
+   "snr": 10,
+   "before": 0.9156790518274815,
+   "after": 12.27455323815211,
+   "gain": 11.358874186324629,
+   "speed": 5.55247084952804
+  },
+  {
+   "name": "fan",
+   "snr": 0,
+   "before": -4.308036414016188,
+   "after": 7.067777753544342,
+   "gain": 11.37581416756053,
+   "speed": 4.837929366231252
+  },
+  {
+   "name": "fan",
+   "snr": 5,
+   "before": -0.36596887665426764,
+   "after": 9.210298486274937,
+   "gain": 9.576267362929205,
+   "speed": 4.9079754601226995
+  },
+  {
+   "name": "fan",
+   "snr": 10,
+   "before": 2.3705430383019386,
+   "after": 11.012693872223064,
+   "gain": 8.642150833921125,
+   "speed": 5.074854097944685
+  }
+ ],
+ "auto": {
+  "hiss 10 dB": {
+   "reasons": [
+    "background noise is strong (speech 17 dB above it)",
+    "room echo about 0.20 s",
+    "little speech found, so using gentle music-friendly settings"
+   ],
+   "guard": [],
+   "strength": 1,
+   "analysis": {
+    "duration": 20,
+    "loudness": -20.46198318253469,
+    "truePeakDb": -0.27604108617753664,
+    "peakDb": -0.7959948032076848,
+    "noiseFloorDb": -30.047475814819336,
+    "speechDb": -13.104321667251124,
+    "loud90Db": -17.731889724731445,
+    "snrDb": 16.94315414756821,
+    "speechFraction": 0.055,
+    "bandwidthHz": 11004,
+    "tiltDbPerOct": -2.402371471544497,
+    "clipping": 0,
+    "clipLevel": 0,
+    "dc": [
+     0.00000851172677275979
+    ],
+    "humHz": 0,
+    "humDb": 0,
+    "rt60": 0.2,
+    "dualMono": false,
+    "balanceDb": 0,
+    "channels": 1
+   },
+   "nat": {
+    "corr": 0.9184051826483094,
+    "musical": 0,
+    "speechFrames": 559
+   }
+  },
+  "fan 5 dB": {
+   "reasons": [
+    "background noise is strong (speech 10 dB above it)",
+    "room echo about 0.20 s",
+    "little speech found, so using gentle music-friendly settings"
+   ],
+   "guard": [],
+   "strength": 1,
+   "analysis": {
+    "duration": 20,
+    "loudness": -21.02439379513474,
+    "truePeakDb": -0.2597340481650843,
+    "peakDb": -0.7817169843589777,
+    "noiseFloorDb": -26.825136184692383,
+    "speechDb": -17.020605087280273,
+    "loud90Db": -17.020605087280273,
+    "snrDb": 9.80453109741211,
+    "speechFraction": 0.0075,
+    "bandwidthHz": 23953,
+    "tiltDbPerOct": -1.8626198857150296,
+    "clipping": 0,
+    "clipLevel": 0,
+    "dc": [
+     0.0011483459211324527
+    ],
+    "humHz": 0,
+    "humDb": 0,
+    "rt60": 0.2,
+    "dualMono": false,
+    "balanceDb": 0,
+    "channels": 1
+   },
+   "nat": {
+    "corr": 0.8932221105836559,
+    "musical": 0,
+    "speechFrames": 559
+   }
+  },
+  "pink 5 dB": {
+   "reasons": [
+    "background noise is strong (speech 9 dB above it)",
+    "room echo about 0.20 s",
+    "phone-quality bandwidth, so adding body instead of treble",
+    "little speech found, so using gentle music-friendly settings"
+   ],
+   "guard": [],
+   "strength": 1,
+   "analysis": {
+    "duration": 20,
+    "loudness": -20.004507491217343,
+    "truePeakDb": -0.9417145360212456,
+    "peakDb": -0.9417145360212456,
+    "noiseFloorDb": -25.85321617126465,
+    "speechDb": -17.293170928955078,
+    "loud90Db": -17.293170928955078,
+    "snrDb": 8.56004524230957,
+    "speechFraction": 0,
+    "bandwidthHz": 2484,
+    "tiltDbPerOct": -3.0861206127428953,
+    "clipping": 0,
+    "clipLevel": 0,
+    "dc": [
+     -0.000008047602899607369
+    ],
+    "humHz": 0,
+    "humDb": 0,
+    "rt60": 0.2,
+    "dualMono": false,
+    "balanceDb": 0,
+    "channels": 1
+   },
+   "nat": {
+    "corr": 0.8470996992771772,
+    "musical": 0,
+    "speechFrames": 559
+   }
+  },
+  "babble 10 dB": {
+   "reasons": [
+    "background noise is strong (speech 19 dB above it)",
+    "room echo about 0.20 s",
+    "little speech found, so using gentle music-friendly settings"
+   ],
+   "guard": [],
+   "strength": 1,
+   "analysis": {
+    "duration": 20,
+    "loudness": -20.644181154709088,
+    "truePeakDb": -0.6402915932696187,
+    "peakDb": -1.2261047299645254,
+    "noiseFloorDb": -33.29292297363281,
+    "speechDb": -14.405321170740375,
+    "loud90Db": -17.82614517211914,
+    "snrDb": 18.887601802892437,
+    "speechFraction": 0.105,
+    "bandwidthHz": 23953,
+    "tiltDbPerOct": -2.944058353837756,
+    "clipping": 0,
+    "clipLevel": 0,
+    "dc": [
+     6.5258901911965e-12
+    ],
+    "humHz": 0,
+    "humDb": 0,
+    "rt60": 0.2,
+    "dualMono": false,
+    "balanceDb": 0,
+    "channels": 1
+   },
+   "nat": {
+    "corr": 0.8876423877916483,
+    "musical": 0,
+    "speechFrames": 559
+   }
+  },
+  "reverb 0.8 s": {
+   "reasons": [
+    "background noise is light (speech 49 dB above it)",
+    "room echo about 0.80 s"
+   ],
+   "guard": [],
+   "strength": 1,
+   "analysis": {
+    "duration": 20,
+    "loudness": -17.706503821125573,
+    "truePeakDb": 0.7147647475478925,
+    "peakDb": 0.5832437519164403,
+    "noiseFloorDb": -67.94972229003906,
+    "speechDb": -19.106954834300637,
+    "loud90Db": -15.548869132995605,
+    "snrDb": 48.842767455738425,
+    "speechFraction": 0.82,
+    "bandwidthHz": 23953,
+    "tiltDbPerOct": -3.3132760129044985,
+    "clipping": 0,
+    "clipLevel": 0,
+    "dc": [
+     -7.451004155764422e-8
+    ],
+    "humHz": 0,
+    "humDb": 0,
+    "rt60": 0.801785893356521,
+    "dualMono": false,
+    "balanceDb": 0,
+    "channels": 1
+   },
+   "nat": {
+    "corr": 0.8511476943433075,
+    "musical": 0,
+    "speechFrames": 559
+   }
+  },
+  "clean": {
+   "reasons": [
+    "background noise is very low (speech 179 dB above it)",
+    "room echo about 0.14 s"
+   ],
+   "guard": [],
+   "strength": 1,
+   "analysis": {
+    "duration": 20,
+    "loudness": -20.07857817104281,
+    "truePeakDb": -0.600118852964552,
+    "peakDb": -1.1837751415159028,
+    "noiseFloorDb": -200,
+    "speechDb": -20.840647393196576,
+    "loud90Db": -18.013612747192383,
+    "snrDb": 179.15935260680342,
+    "speechFraction": 0.6925,
+    "bandwidthHz": 23953,
+    "tiltDbPerOct": -3.735175922299353,
+    "clipping": 0,
+    "clipLevel": 0,
+    "dc": [
+     3.699412954562219e-12
+    ],
+    "humHz": 0,
+    "humDb": 0,
+    "rt60": 0.14235890985155314,
+    "dualMono": false,
+    "balanceDb": 0,
+    "channels": 1
+   },
+   "nat": {
+    "corr": 0.9857975568712533,
+    "musical": 0,
+    "speechFrames": 559
+   }
+  }
+ }
+}
